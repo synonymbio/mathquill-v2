@@ -945,7 +945,7 @@ LatexCmds['Φ'] = LatexCmds.Phi = bindUppercaseGreek('Phi');
 LatexCmds['Ψ'] = LatexCmds.Psi = bindUppercaseGreek('Psi');
 LatexCmds['Ω'] = LatexCmds.Omega = bindUppercaseGreek('Omega');
 LatexCmds['∀'] = LatexCmds.forall = bindUppercaseGreek('forall');
-// Why is there no "exists"?
+// "exists" is in advancedSymbols
 
 // symbols that aren't a single MathCommand, but are instead a whole
 // Fragment. Creates the Fragment from a LaTeX string
