@@ -1248,7 +1248,15 @@ suite('typing with auto-replaces', function () {
       assertLatex('\\tau');
       mq.keystroke('Backspace');
 
+      mq.typedText('τ');
+      assertLatex('\\tau');
+      mq.keystroke('Backspace');
+
       mq.typedText('phi');
+      assertLatex('\\phi');
+      mq.keystroke('Backspace');
+
+      mq.typedText('ϕ');
       assertLatex('\\phi');
       mq.keystroke('Backspace');
 
@@ -1256,7 +1264,15 @@ suite('typing with auto-replaces', function () {
       assertLatex('\\theta');
       mq.keystroke('Backspace');
 
+      mq.typedText('θ');
+      assertLatex('\\theta');
+      mq.keystroke('Backspace');
+
       mq.typedText('Gamma');
+      assertLatex('\\Gamma');
+      mq.keystroke('Backspace');
+
+      mq.typedText('Γ');
       assertLatex('\\Gamma');
       mq.keystroke('Backspace');
 

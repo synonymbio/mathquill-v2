@@ -810,84 +810,113 @@ LatexCmds['⟂'] = LatexCmds.perp = bindVanillaSymbol(
 //the following are all Greek to me, but this helped a lot: http://www.ams.org/STIX/ion/stixsig03.html
 
 //lowercase Greek letter variables
-LatexCmds.alpha =
-  LatexCmds.beta =
-  LatexCmds.gamma =
-  LatexCmds.delta =
-  LatexCmds.zeta =
-  LatexCmds.eta =
-  LatexCmds.theta =
-  LatexCmds.iota =
-  LatexCmds.kappa =
-  LatexCmds.mu =
-  LatexCmds.nu =
-  LatexCmds.xi =
-  LatexCmds.rho =
-  LatexCmds.sigma =
-  LatexCmds.tau =
-  LatexCmds.chi =
-  LatexCmds.psi =
-  LatexCmds.omega =
-    (latex) =>
-      new Variable('\\' + latex + ' ', h.entityText('&' + latex + ';'));
+
+function bindLowercaseGreek(latex: string) {
+  return bindVariable('\\' + latex + ' ', '&' + latex + ';', latex);
+}
+
+LatexCmds['α'] = LatexCmds.alpha = bindLowercaseGreek('alpha');
+LatexCmds['β'] = LatexCmds.beta = bindLowercaseGreek('beta');
+LatexCmds['γ'] = LatexCmds.gamma = bindLowercaseGreek('gamma');
+LatexCmds['δ'] = LatexCmds.delta = bindLowercaseGreek('delta');
+LatexCmds['ζ'] = LatexCmds.zeta = bindLowercaseGreek('zeta');
+LatexCmds['η'] = LatexCmds.eta = bindLowercaseGreek('eta');
+LatexCmds['θ'] = LatexCmds.theta = bindLowercaseGreek('theta');
+LatexCmds['ι'] = LatexCmds.iota = bindLowercaseGreek('iota');
+LatexCmds['κ'] = LatexCmds.kappa = bindLowercaseGreek('kappa');
+LatexCmds['μ'] = LatexCmds.mu = bindLowercaseGreek('mu');
+LatexCmds['ν'] = LatexCmds.nu = bindLowercaseGreek('nu');
+LatexCmds['ξ'] = LatexCmds.xi = bindLowercaseGreek('xi');
+LatexCmds['ρ'] = LatexCmds.rho = bindLowercaseGreek('rho');
+LatexCmds['σ'] = LatexCmds.sigma = bindLowercaseGreek('sigma');
+LatexCmds['τ'] = LatexCmds.tau = bindLowercaseGreek('tau');
+LatexCmds['χ'] = LatexCmds.chi = bindLowercaseGreek('chi');
+LatexCmds['ψ'] = LatexCmds.psi = bindLowercaseGreek('psi');
+LatexCmds['ω'] = LatexCmds.omega = bindLowercaseGreek('omega');
 
 //why can't anybody FUCKING agree on these
-LatexCmds.phi = bindVariable('\\phi ', '&#981;', 'phi'); //W3C or Unicode?
+LatexCmds['ϕ'] = LatexCmds.phi = bindVariable('\\phi ', '&#981;', 'phi'); //W3C or Unicode?
 
-LatexCmds.phiv = LatexCmds.varphi = bindVariable('\\varphi ', '&phi;', 'phi'); //Elsevier and 9573-13 //AMS and LaTeX
+LatexCmds['φ'] =
+  LatexCmds.phiv =
+  LatexCmds.varphi =
+    bindVariable('\\varphi ', '&phi;', 'phi'); //Elsevier and 9573-13 //AMS and LaTeX
 
-LatexCmds.epsilon = bindVariable('\\epsilon ', '&#1013;', 'epsilon'); //W3C or Unicode?
-
-LatexCmds.epsiv = LatexCmds.varepsilon = bindVariable(
-  //Elsevier and 9573-13 //AMS and LaTeX
-  '\\varepsilon ',
-  '&epsilon;',
+LatexCmds['ϵ'] = LatexCmds.epsilon = bindVariable(
+  '\\epsilon ',
+  '&#1013;',
   'epsilon'
-);
+); //W3C or Unicode?
 
-LatexCmds.piv = LatexCmds.varpi = bindVariable('\\varpi ', '&piv;', 'piv'); //W3C/Unicode and Elsevier and 9573-13 //AMS and LaTeX
+LatexCmds['ε'] =
+  LatexCmds.epsiv =
+  LatexCmds.varepsilon =
+    bindVariable(
+      //Elsevier and 9573-13 //AMS and LaTeX
+      '\\varepsilon ',
+      '&epsilon;',
+      'epsilon'
+    );
 
-LatexCmds.sigmaf = //W3C/Unicode
+LatexCmds['ϖ'] =
+  LatexCmds.piv =
+  LatexCmds.varpi =
+    bindVariable('\\varpi ', '&piv;', 'piv'); //W3C/Unicode and Elsevier and 9573-13 //AMS and LaTeX
+
+LatexCmds['ς'] = // Unicode
+  LatexCmds.sigmaf = //W3C/Unicode
   LatexCmds.sigmav = //Elsevier
   LatexCmds.varsigma = //LaTeX
     bindVariable('\\varsigma ', '&sigmaf;', 'sigma');
 
-LatexCmds.thetav = //Elsevier and 9573-13
+LatexCmds['ϑ'] = // Unicode
+  LatexCmds.thetav = //Elsevier and 9573-13
   LatexCmds.vartheta = //AMS and LaTeX
   LatexCmds.thetasym = //W3C/Unicode
     bindVariable('\\vartheta ', '&thetasym;', 'theta');
 
-LatexCmds.upsilon = LatexCmds.upsi = bindVariable(
-  //AMS and LaTeX and W3C/Unicode //Elsevier and 9573-13
-  '\\upsilon ',
-  '&upsilon;',
-  'upsilon'
-);
+LatexCmds['υ'] =
+  LatexCmds.upsilon =
+  LatexCmds.upsi =
+    bindVariable(
+      //AMS and LaTeX and W3C/Unicode //Elsevier and 9573-13
+      '\\upsilon ',
+      '&upsilon;',
+      'upsilon'
+    );
 
 //these aren't even mentioned in the HTML character entity references
-LatexCmds.gammad = //Elsevier
+LatexCmds['Ϝ'] =
+  LatexCmds.gammad = //Elsevier
   LatexCmds.Gammad = //9573-13 -- WTF, right? I dunno if this was a typo in the reference (see above)
   LatexCmds.digamma = //LaTeX
     bindVariable('\\digamma ', '&#989;', 'gamma');
 
-LatexCmds.kappav = LatexCmds.varkappa = bindVariable(
-  //Elsevier //AMS and LaTeX
-  '\\varkappa ',
-  '&#1008;',
-  'kappa'
-);
+LatexCmds['ϰ'] =
+  LatexCmds.kappav =
+  LatexCmds.varkappa =
+    bindVariable(
+      //Elsevier //AMS and LaTeX
+      '\\varkappa ',
+      '&#1008;',
+      'kappa'
+    );
 
-LatexCmds.rhov = LatexCmds.varrho = bindVariable('\\varrho ', '&#1009;', 'rho'); //Elsevier and 9573-13 //AMS and LaTeX
+LatexCmds['ϱ'] =
+  LatexCmds.rhov =
+  LatexCmds.varrho =
+    bindVariable('\\varrho ', '&#1009;', 'rho'); //Elsevier and 9573-13 //AMS and LaTeX
 
 //Greek constants, look best in non-italicized Times New Roman
 LatexCmds.pi = LatexCmds['π'] = () =>
   new NonSymbolaSymbol('\\pi ', h.entityText('&pi;'), 'pi');
-LatexCmds.lambda = () =>
+LatexCmds['λ'] = LatexCmds.lambda = () =>
   new NonSymbolaSymbol('\\lambda ', h.entityText('&lambda;'), 'lambda');
 
 //uppercase greek letters
 
-LatexCmds.Upsilon = //LaTeX
+LatexCmds['Υ'] =
+  LatexCmds.Upsilon = //LaTeX
   LatexCmds.Upsi = //Elsevier and 9573-13
   LatexCmds.upsih = //W3C/Unicode "upsilon with hook"
   LatexCmds.Upsih = //'cos it makes sense to me
@@ -899,19 +928,24 @@ LatexCmds.Upsilon = //LaTeX
       ); //Symbola's 'upsilon with a hook' is a capital Y without hooks :(
 
 //other symbols with the same LaTeX command and HTML character entity reference
-LatexCmds.Gamma =
-  LatexCmds.Delta =
-  LatexCmds.Theta =
-  LatexCmds.Lambda =
-  LatexCmds.Xi =
-  LatexCmds.Pi =
-  LatexCmds.Sigma =
-  LatexCmds.Phi =
-  LatexCmds.Psi =
-  LatexCmds.Omega =
-  LatexCmds.forall =
-    (latex) =>
-      new VanillaSymbol('\\' + latex + ' ', h.entityText('&' + latex + ';'));
+
+function bindUppercaseGreek(latex: string) {
+  return () =>
+    new VanillaSymbol('\\' + latex + ' ', h.entityText('&' + latex + ';'));
+}
+
+LatexCmds['Γ'] = LatexCmds.Gamma = bindUppercaseGreek('Gamma');
+LatexCmds['Δ'] = LatexCmds.Delta = bindUppercaseGreek('Delta');
+LatexCmds['Θ'] = LatexCmds.Theta = bindUppercaseGreek('Theta');
+LatexCmds['Λ'] = LatexCmds.Lambda = bindUppercaseGreek('Lambda');
+LatexCmds['Ξ'] = LatexCmds.Xi = bindUppercaseGreek('Xi');
+LatexCmds['Π'] = LatexCmds.Pi = bindUppercaseGreek('Pi');
+LatexCmds['Σ'] = LatexCmds.Sigma = bindUppercaseGreek('Sigma');
+LatexCmds['Φ'] = LatexCmds.Phi = bindUppercaseGreek('Phi');
+LatexCmds['Ψ'] = LatexCmds.Psi = bindUppercaseGreek('Psi');
+LatexCmds['Ω'] = LatexCmds.Omega = bindUppercaseGreek('Omega');
+LatexCmds['∀'] = LatexCmds.forall = bindUppercaseGreek('forall');
+// "exists" is in advancedSymbols
 
 // symbols that aren't a single MathCommand, but are instead a whole
 // Fragment. Creates the Fragment from a LaTeX string
@@ -1221,7 +1255,8 @@ LatexCmds['≥'] =
   LatexCmds.ge =
   LatexCmds.geq =
     () => new Inequality(greater, false);
-LatexCmds.infty =
+LatexCmds['∞'] =
+  LatexCmds.infty =
   LatexCmds.infin =
   LatexCmds.infinity =
     bindVanillaSymbol('\\infty ', '&infin;', 'infinity');
