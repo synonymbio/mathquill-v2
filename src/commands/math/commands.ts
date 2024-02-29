@@ -939,7 +939,12 @@ var LiveFraction =
         if (!this.replacedFragment) {
           var leftward = cursor[L];
 
-          if (!cursor.options.typingSlashCreatesNewFraction) {
+          const dontScan =
+            cursor.options.typingSlashCreatesNewFraction &&
+            this instanceof Fraction;
+
+          if (!dontScan) {
+            // The user is typing "/" or "over" or "choose". Scan left to get content inside it.
             while (
               leftward &&
               !(
@@ -956,6 +961,8 @@ var LiveFraction =
             leftward instanceof SummationNotation &&
             leftward[R] instanceof SupSub
           ) {
+            // The previous step scanned too far. `\sum_1^5` looks like [SummationNotation,SupSub],
+            // so scan back right
             leftward = leftward[R] as MQNode;
             let leftwardR = leftward[R];
             if (
@@ -965,6 +972,9 @@ var LiveFraction =
               leftward = leftward[R];
           }
 
+          // `leftward` is the first node (from-right-to-left) that is broken on, so
+          // `leftwardR` is the last node (from right-to-left) that should be included in the
+          // top of the Fraction or Binomial.
           if (leftward !== cursor[L] && !cursor.isTooDeep(1)) {
             let leftwardR = (leftward as MQNode)[R] as MQNode;
             let cursorL = cursor[L] as MQNode;
@@ -1677,13 +1687,23 @@ class Binomial extends DelimsNode {
   textTemplate = ['choose(', ',', ')'];
   mathspeakTemplate = ['StartBinomial,', 'Choose', ', EndBinomial'];
   ariaLabel = 'binomial';
+
+  finalizeTree() {
+    const endsL = this.getEnd(L);
+    const endsR = this.getEnd(R);
+    this.upInto = endsR.upOutOf = endsL;
+    this.downInto = endsL.downOutOf = endsR;
+    // https://math.stackexchange.com/a/1617456 cites Knuth as the source of 'upper index' and 'lower index'
+    endsL.ariaLabel = 'upper index';
+    endsR.ariaLabel = 'lower index';
+  }
 }
 
 LatexCmds.binom = LatexCmds.binomial = Binomial;
 
 LatexCmds.choose = class extends Binomial {
   createLeftOf(cursor: Cursor) {
-    LiveFraction.prototype.createLeftOf(cursor);
+    LiveFraction.prototype.createLeftOf.call(this, cursor);
   }
 };
 

@@ -63,6 +63,24 @@ suite('typing with auto-replaces', function () {
     });
   });
 
+  suite('Choose', function () {
+    test('full MathQuill', function () {
+      mq.typedText('1').cmd('\\choose').typedText('2').keystroke('Tab');
+      mq.typedText('+sinx').cmd('\\choose');
+      assertLatex('\\binom{1}{2}+\\binom{\\sin x}{ }');
+      mq.latex('').typedText('1+').cmd('\\choose').typedText('2');
+      assertLatex('1+\\binom{2}{ }');
+      mq.latex('').typedText('1 2').cmd('\\choose').typedText('3');
+      assertLatex('1\\ \\binom{2}{3}');
+    });
+
+    test('mathquill-basic', function () {
+      var mq_basic = MQBasic.MathField($('<span></span>').appendTo('#mock')[0]);
+      mq_basic.typedText('1').cmd('\\choose').typedText('2');
+      assert.equal(mq_basic.latex(), '\\binom{1}{2}');
+    });
+  });
+
   suite('EquivalentMinus', function () {
     test('different minus symbols', function () {
       //these 4 are all different characters (!!)
@@ -1200,6 +1218,11 @@ suite('typing with auto-replaces', function () {
       //autoParenthesized and also operatored
       mq.typedText('1/');
       assertLatex('1\\frac{ }{ }');
+    });
+
+    test("typing slash creates new fraction doesn't affect choose", function () {
+      mq.typedText('1').cmd('\\choose');
+      assertLatex('\\binom{1}{ }');
     });
   });
 
