@@ -140,6 +140,41 @@ suite('aria', function () {
     mathField.latex('');
   });
 
+  test('typing and backspacing a binomial', function () {
+    mathField.typedText('1');
+    assertAriaEqual('1');
+    mathField.cmd('\\choose');
+    // Matching behavior of "over", we don't get "choose" as the ARIA here.
+    mathField.typedText('2');
+    assertAriaEqual('2');
+
+    mathField.keystroke('Tab');
+    assertAriaEqual('after StartBinomial, 1 Choose 2 , EndBinomial');
+
+    mathField.keystroke('Backspace');
+    assertAriaEqual('end of bottom 2');
+    mathField.keystroke('Backspace');
+    assertAriaEqual('2');
+    mathField.keystroke('Backspace');
+    assertAriaEqual('Choose');
+    mathField.keystroke('Backspace');
+    assertAriaEqual('1');
+  });
+
+  test('navigating a binomial', function () {
+    mathField.typedText('1');
+    assertAriaEqual('1');
+    mathField.cmd('\\choose');
+    // Matching behavior of "over", we don't get "choose" as the ARIA here.
+    mathField.typedText('2');
+    assertAriaEqual('2');
+    mathField.keystroke('Up');
+    assertAriaEqual('top 1');
+    mathField.keystroke('Down');
+    assertAriaEqual('bottom 2');
+    mathField.latex('');
+  });
+
   test('typing and backspacing through parenthesies', function () {
     mathField.typedText('(');
     assertAriaEqual('left parenthesis');

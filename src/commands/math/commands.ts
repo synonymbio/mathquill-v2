@@ -1677,6 +1677,15 @@ class Binomial extends DelimsNode {
   textTemplate = ['choose(', ',', ')'];
   mathspeakTemplate = ['StartBinomial,', 'Choose', ', EndBinomial'];
   ariaLabel = 'binomial';
+
+  finalizeTree() {
+    const endsL = this.getEnd(L);
+    const endsR = this.getEnd(R);
+    this.upInto = endsR.upOutOf = endsL;
+    this.downInto = endsL.downOutOf = endsR;
+    endsL.ariaLabel = 'top';
+    endsR.ariaLabel = 'bottom';
+  }
 }
 
 LatexCmds.binom = LatexCmds.binomial = Binomial;
