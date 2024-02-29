@@ -1683,8 +1683,9 @@ class Binomial extends DelimsNode {
     const endsR = this.getEnd(R);
     this.upInto = endsR.upOutOf = endsL;
     this.downInto = endsL.downOutOf = endsR;
-    endsL.ariaLabel = 'top';
-    endsR.ariaLabel = 'bottom';
+    // https://math.stackexchange.com/a/1617456 cites Knuth as the source of 'upper index' and 'lower index'
+    endsL.ariaLabel = 'upper index';
+    endsR.ariaLabel = 'lower index';
   }
 }
 

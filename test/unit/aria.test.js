@@ -152,7 +152,7 @@ suite('aria', function () {
     assertAriaEqual('after StartBinomial, 1 Choose 2 , EndBinomial');
 
     mathField.keystroke('Backspace');
-    assertAriaEqual('end of bottom 2');
+    assertAriaEqual('end of lower index 2');
     mathField.keystroke('Backspace');
     assertAriaEqual('2');
     mathField.keystroke('Backspace');
@@ -169,9 +169,9 @@ suite('aria', function () {
     mathField.typedText('2');
     assertAriaEqual('2');
     mathField.keystroke('Up');
-    assertAriaEqual('top 1');
+    assertAriaEqual('upper index 1');
     mathField.keystroke('Down');
-    assertAriaEqual('bottom 2');
+    assertAriaEqual('lower index 2');
     mathField.latex('');
   });
 
