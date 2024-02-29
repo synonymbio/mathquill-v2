@@ -1219,6 +1219,11 @@ suite('typing with auto-replaces', function () {
       mq.typedText('1/');
       assertLatex('1\\frac{ }{ }');
     });
+
+    test("typing slash creates new fraction doesn't affect choose", function () {
+      mq.typedText('1').cmd('\\choose');
+      assertLatex('\\binom{1}{ }');
+    });
   });
 
   suite('autoCommands', function () {
