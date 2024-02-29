@@ -90,19 +90,22 @@ class Controller_focusBlur extends Controller_exportText {
     clearTimeout(this.blurTimeout); // tabs/windows, not intentional blur
     if (this.cursor.selection)
       this.cursor.selection.domFrag().addClass('mq-blur');
-    this.blur();
+    this.blurWithoutResettingCursor();
     this.updateMathspeak();
   };
 
   private blur() {
-    // not directly in the textarea blur handler so as to be
-    this.cursor.hide().parent.blur(this.cursor); // synchronous with/in the same frame as
-    domFrag(this.container).removeClass('mq-focused'); // clearing/blurring selection
-    window.removeEventListener('blur', this.handleWindowBlur);
-
+    this.blurWithoutResettingCursor();
     if (this.options && this.options.resetCursorOnBlur) {
       this.cursor.resetToEnd(this);
     }
+  }
+
+  private blurWithoutResettingCursor() {
+    // not directly in the textarea blur handler so has to be
+    this.cursor.hide().parent.blur(this.cursor); // synchronous with/in the same frame as
+    domFrag(this.container).removeClass('mq-focused'); // clearing/blurring selection
+    window.removeEventListener('blur', this.handleWindowBlur);
   }
 
   addEditableFocusBlurListeners() {
