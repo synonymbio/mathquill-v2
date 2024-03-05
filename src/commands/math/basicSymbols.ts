@@ -676,6 +676,28 @@ baseOptionProcessors.autoOperatorNames = function (cmds) {
   dict._maxLength = maxLength;
   return dict;
 };
+
+Options.prototype.infixOperatorNames = {};
+
+baseOptionProcessors.infixOperatorNames = function (cmds) {
+  if (typeof cmds !== 'string') {
+    throw '"' + cmds + '" not a space-delimited list';
+  }
+  if (!/^[a-z]+(?: [a-z]+)*$/i.test(cmds)) {
+    throw '"' + cmds + '" not a space-delimited list of letters';
+  }
+  var list = cmds.split(' ');
+  var dict: { [word in string]?: true } = {};
+  for (var i = 0; i < list.length; i += 1) {
+    var cmd = list[i];
+    if (cmd.length < 2) {
+      throw '"' + cmd + '" not minimum length of 2';
+    }
+    dict[cmd] = true;
+  }
+  return dict;
+};
+
 class OperatorName extends MQSymbol {
   ctrlSeq: string;
   constructor(fn?: string) {
