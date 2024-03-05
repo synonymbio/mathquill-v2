@@ -1050,7 +1050,7 @@ LatexCmds['√'] = () => new LatexFragment('\\sqrt{}');
 
 // Binary operator determination is used in several contexts for PlusMinus nodes and their descendants.
 // For instance, we set the item's class name based on this factor, and also assign different mathspeak values (plus vs positive, negative vs minus).
-function isBinaryOperator(node: NodeRef): boolean {
+function plusMinusIsBinaryOperator(node: NodeRef): boolean {
   if (!node) return false;
 
   const nodeL = node[L];
@@ -1073,7 +1073,7 @@ function isBinaryOperator(node: NodeRef): boolean {
     //if we are in a style block at the leftmost edge, determine unary/binary based on
     //the style block
     //this allows style blocks to be transparent for unary/binary purposes
-    return isBinaryOperator(node.parent.parent);
+    return plusMinusIsBinaryOperator(node.parent.parent);
   } else {
     return false;
   }
@@ -1098,7 +1098,7 @@ var PlusMinus = class extends BinaryOperator {
 
   sharedSiblingMethod(_opts?: CursorOptions, dir?: Direction) {
     if (dir === R) return; // ignore if sibling only changed on the right
-    this.domFrag().oneElement().className = isBinaryOperator(this)
+    this.domFrag().oneElement().className = plusMinusIsBinaryOperator(this)
       ? 'mq-binary-operator'
       : '';
 
@@ -1111,7 +1111,7 @@ LatexCmds['+'] = class extends PlusMinus {
     super('+', h.text('+'));
   }
   mathspeak(): string {
-    return isBinaryOperator(this) ? 'plus' : 'positive';
+    return plusMinusIsBinaryOperator(this) ? 'plus' : 'positive';
   }
 };
 
@@ -1121,7 +1121,7 @@ class MinusNode extends PlusMinus {
     super('-', h.entityText('&minus;'));
   }
   mathspeak(): string {
-    return isBinaryOperator(this) ? 'minus' : 'negative';
+    return plusMinusIsBinaryOperator(this) ? 'minus' : 'negative';
   }
 }
 LatexCmds['−'] = LatexCmds['—'] = LatexCmds['–'] = LatexCmds['-'] = MinusNode;
