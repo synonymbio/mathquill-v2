@@ -336,6 +336,27 @@ baseOptionProcessors.autoParenthesizedFunctions = function (cmds) {
   return dict;
 };
 
+function letterSequenceEndingAtNode(node: NodeRef, maxLength: number) {
+  let str = '';
+  let i = 0;
+  // Inelegant approach to avoid counting operatorname letters as letters here:
+  // node.ctrlSeq === node.letter holds true unless node is:
+  //  - first or last letter in an operator name like \operatorname{arcsinh}, or
+  //    (`\operatorname{` is prepended to first, and `}` is appended to last)
+  //  - first or last letter in a builtin like `\sin `
+  //    (`\` is prepended to first, and ` ` (space) is appended to last)
+  while (
+    node instanceof Letter &&
+    node.ctrlSeq === node.letter &&
+    i < maxLength
+  ) {
+    str = node.letter + str;
+    node = node[L];
+    i += 1;
+  }
+  return str;
+}
+
 class Letter extends Variable {
   letter: string;
 
@@ -355,20 +376,12 @@ class Letter extends Variable {
     if (maxLength > 0) {
       // want longest possible autocommand, so join together longest
       // sequence of letters
-      var str = '';
-      var l: NodeRef = this;
-      var i = 0;
-      // FIXME: l.ctrlSeq === l.letter checks if first or last in an operator name
-      while (l instanceof Letter && l.ctrlSeq === l.letter && i < maxLength) {
-        str = l.letter + str;
-        l = l[L];
-        i += 1;
-      }
+      let str = letterSequenceEndingAtNode(this, maxLength) ?? '';
       // check for an autocommand, going thru substrings longest to shortest
       while (str.length) {
         if (autoCmds.hasOwnProperty(str)) {
-          l = this;
-          for (i = 1; l && i < str.length; i += 1, l = l[L]);
+          let l: NodeRef = this;
+          for (let i = 1; l && i < str.length; i += 1, l = l[L]);
 
           new Fragment(l, this).remove();
           cursor[L] = (l as MQNode)[L];
