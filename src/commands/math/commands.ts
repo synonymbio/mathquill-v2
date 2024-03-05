@@ -949,6 +949,7 @@ var LiveFraction =
               leftward &&
               !(
                 leftward instanceof BinaryOperator ||
+                (leftward instanceof Letter && leftward.endsWord === 'for') ||
                 leftward instanceof (LatexCmds.text || noop) ||
                 leftward instanceof SummationNotation ||
                 leftward.ctrlSeq === '\\ ' ||

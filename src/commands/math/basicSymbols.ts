@@ -359,6 +359,9 @@ function letterSequenceEndingAtNode(node: NodeRef, maxLength: number) {
 
 class Letter extends Variable {
   letter: string;
+  /** If this is the last letter of an operatorname (`\operatorname{arcsinh}`)
+   * or builtin (`\sin`), give its name, e.g. `arcsinh` or `sin`. */
+  endsWord?: string;
 
   constructor(ch: string) {
     super(ch);
@@ -446,6 +449,7 @@ class Letter extends Variable {
   italicize(bool: boolean) {
     this.isItalic = bool;
     this.isPartOfOperator = !bool;
+    if (bool) delete this.endsWord;
     this.domFrag().toggleClass('mq-operator-name', !bool);
     return this;
   }
@@ -509,7 +513,7 @@ class Letter extends Variable {
     ) {
       for (var len = min(autoOpsLength, str.length - i); len > 0; len -= 1) {
         var word = str.slice(i, i + len);
-        var last: MQNode = undefined!; // TODO - TS complaining that we use last before assigning to it
+        var last: Letter = undefined!; // TODO - TS complaining that we use last before assigning to it
 
         if (autoOps.hasOwnProperty(word)) {
           for (
@@ -527,6 +531,7 @@ class Letter extends Variable {
           first.ctrlSeq =
             (isBuiltIn ? '\\' : '\\operatorname{') + first.ctrlSeq;
           last.ctrlSeq += isBuiltIn ? ' ' : '}';
+          last.endsWord = word;
 
           if (TwoWordOpNames.hasOwnProperty(word)) {
             const lastL = last[L];
