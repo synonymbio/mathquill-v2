@@ -57,6 +57,7 @@ const processedOptions = {
   quietEmptyDelimiters: true,
   autoParenthesizedFunctions: true,
   autoOperatorNames: true,
+  infixOperatorNames: true,
   leftRightIntoCmdGoes: true,
   maxDepth: true,
   interpretTildeAsSim: true,
@@ -113,6 +114,7 @@ class Options {
   overrideTypedText?: (text: string) => void;
   overrideKeystroke: (key: string, event: KeyboardEvent) => void;
   autoOperatorNames: AutoDict;
+  infixOperatorNames: { [name in string]?: true };
   autoCommands: AutoDict;
   autoParenthesizedFunctions: AutoDict;
   quietEmptyDelimiters: { [id: string]: any };

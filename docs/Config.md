@@ -82,6 +82,16 @@ This defaults to the LaTeX built-in operator names ([Section 3.17 of the Short M
 
 Just like [`autoCommands`](#autocommands) above, this takes a string formatted as a space-delimited list of LaTeX commands.
 
+## infixOperatorNames
+
+`infixOperatorNames` specifies a set of operator names that should be treated as infix operators, for example for determining when to stop scanning left before a fraction.
+
+For example, [Desmos](https://www.desmos.com/calculator) includes `for` in this option, so typing `(t,t) for 1/2 < t < 1` becomes `(t,t) for \frac{1}{2} < t < 1` and not `\frac{(t,t) for 1}{2} < t < 1`.
+
+This defaults to being empty.
+
+Just like [`autoCommands`](#autocommands) above, this takes a string formatted as a space-delimited list of LaTeX commands.
+
 ## maxDepth
 
 `maxDepth` specifies the maximum number of nested MathBlocks. When `maxDepth` is set to 1, the user can type simple math symbols directly into the editor but not into nested MathBlocks, e.g. the numerator and denominator of a fraction.

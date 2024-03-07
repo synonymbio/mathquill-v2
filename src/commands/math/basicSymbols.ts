@@ -336,8 +336,32 @@ baseOptionProcessors.autoParenthesizedFunctions = function (cmds) {
   return dict;
 };
 
+function letterSequenceEndingAtNode(node: NodeRef, maxLength: number) {
+  let str = '';
+  let i = 0;
+  // Inelegant approach to avoid counting operatorname letters as letters here:
+  // node.ctrlSeq === node.letter holds true unless node is:
+  //  - first or last letter in an operator name like \operatorname{arcsinh}, or
+  //    (`\operatorname{` is prepended to first, and `}` is appended to last)
+  //  - first or last letter in a builtin like `\sin `
+  //    (`\` is prepended to first, and ` ` (space) is appended to last)
+  while (
+    node instanceof Letter &&
+    node.ctrlSeq === node.letter &&
+    i < maxLength
+  ) {
+    str = node.letter + str;
+    node = node[L];
+    i += 1;
+  }
+  return str;
+}
+
 class Letter extends Variable {
   letter: string;
+  /** If this is the last letter of an operatorname (`\operatorname{arcsinh}`)
+   * or builtin (`\sin`), give its name, e.g. `arcsinh` or `sin`. */
+  endsWord?: string;
 
   constructor(ch: string) {
     super(ch);
@@ -355,20 +379,12 @@ class Letter extends Variable {
     if (maxLength > 0) {
       // want longest possible autocommand, so join together longest
       // sequence of letters
-      var str = '';
-      var l: NodeRef = this;
-      var i = 0;
-      // FIXME: l.ctrlSeq === l.letter checks if first or last in an operator name
-      while (l instanceof Letter && l.ctrlSeq === l.letter && i < maxLength) {
-        str = l.letter + str;
-        l = l[L];
-        i += 1;
-      }
+      let str = letterSequenceEndingAtNode(this, maxLength) ?? '';
       // check for an autocommand, going thru substrings longest to shortest
       while (str.length) {
         if (autoCmds.hasOwnProperty(str)) {
-          l = this;
-          for (i = 1; l && i < str.length; i += 1, l = l[L]);
+          let l: NodeRef = this;
+          for (let i = 1; l && i < str.length; i += 1, l = l[L]);
 
           new Fragment(l, this).remove();
           cursor[L] = (l as MQNode)[L];
@@ -433,6 +449,7 @@ class Letter extends Variable {
   italicize(bool: boolean) {
     this.isItalic = bool;
     this.isPartOfOperator = !bool;
+    if (bool) delete this.endsWord;
     this.domFrag().toggleClass('mq-operator-name', !bool);
     return this;
   }
@@ -496,7 +513,7 @@ class Letter extends Variable {
     ) {
       for (var len = min(autoOpsLength, str.length - i); len > 0; len -= 1) {
         var word = str.slice(i, i + len);
-        var last: MQNode = undefined!; // TODO - TS complaining that we use last before assigning to it
+        var last: Letter = undefined!; // TODO - TS complaining that we use last before assigning to it
 
         if (autoOps.hasOwnProperty(word)) {
           for (
@@ -514,6 +531,7 @@ class Letter extends Variable {
           first.ctrlSeq =
             (isBuiltIn ? '\\' : '\\operatorname{') + first.ctrlSeq;
           last.ctrlSeq += isBuiltIn ? ' ' : '}';
+          last.endsWord = word;
 
           if (TwoWordOpNames.hasOwnProperty(word)) {
             const lastL = last[L];
@@ -658,6 +676,28 @@ baseOptionProcessors.autoOperatorNames = function (cmds) {
   dict._maxLength = maxLength;
   return dict;
 };
+
+Options.prototype.infixOperatorNames = {};
+
+baseOptionProcessors.infixOperatorNames = function (cmds) {
+  if (typeof cmds !== 'string') {
+    throw '"' + cmds + '" not a space-delimited list';
+  }
+  if (!/^[a-z]+(?: [a-z]+)*$/i.test(cmds)) {
+    throw '"' + cmds + '" not a space-delimited list of letters';
+  }
+  var list = cmds.split(' ');
+  var dict: { [word in string]?: true } = {};
+  for (var i = 0; i < list.length; i += 1) {
+    var cmd = list[i];
+    if (cmd.length < 2) {
+      throw '"' + cmd + '" not minimum length of 2';
+    }
+    dict[cmd] = true;
+  }
+  return dict;
+};
+
 class OperatorName extends MQSymbol {
   ctrlSeq: string;
   constructor(fn?: string) {
@@ -1050,7 +1090,7 @@ LatexCmds['√'] = () => new LatexFragment('\\sqrt{}');
 
 // Binary operator determination is used in several contexts for PlusMinus nodes and their descendants.
 // For instance, we set the item's class name based on this factor, and also assign different mathspeak values (plus vs positive, negative vs minus).
-function isBinaryOperator(node: NodeRef): boolean {
+function plusMinusIsBinaryOperator(node: NodeRef): boolean {
   if (!node) return false;
 
   const nodeL = node[L];
@@ -1073,7 +1113,7 @@ function isBinaryOperator(node: NodeRef): boolean {
     //if we are in a style block at the leftmost edge, determine unary/binary based on
     //the style block
     //this allows style blocks to be transparent for unary/binary purposes
-    return isBinaryOperator(node.parent.parent);
+    return plusMinusIsBinaryOperator(node.parent.parent);
   } else {
     return false;
   }
@@ -1098,7 +1138,7 @@ var PlusMinus = class extends BinaryOperator {
 
   sharedSiblingMethod(_opts?: CursorOptions, dir?: Direction) {
     if (dir === R) return; // ignore if sibling only changed on the right
-    this.domFrag().oneElement().className = isBinaryOperator(this)
+    this.domFrag().oneElement().className = plusMinusIsBinaryOperator(this)
       ? 'mq-binary-operator'
       : '';
 
@@ -1111,7 +1151,7 @@ LatexCmds['+'] = class extends PlusMinus {
     super('+', h.text('+'));
   }
   mathspeak(): string {
-    return isBinaryOperator(this) ? 'plus' : 'positive';
+    return plusMinusIsBinaryOperator(this) ? 'plus' : 'positive';
   }
 };
 
@@ -1121,7 +1161,7 @@ class MinusNode extends PlusMinus {
     super('-', h.entityText('&minus;'));
   }
   mathspeak(): string {
-    return isBinaryOperator(this) ? 'minus' : 'negative';
+    return plusMinusIsBinaryOperator(this) ? 'minus' : 'negative';
   }
 }
 LatexCmds['−'] = LatexCmds['—'] = LatexCmds['–'] = LatexCmds['-'] = MinusNode;

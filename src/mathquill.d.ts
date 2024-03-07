@@ -131,6 +131,7 @@ declare namespace MathQuill {
       overrideTypedText?: (text: string) => void;
       overrideKeystroke?: (key: string, event: KeyboardEvent) => void;
       autoOperatorNames?: string;
+      infixOperatorNames?: string;
       autoCommands?: string;
       logAriaAlerts?: boolean;
       autoParenthesizedFunctions?: string;
