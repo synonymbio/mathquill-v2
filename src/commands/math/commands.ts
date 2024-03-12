@@ -1108,6 +1108,16 @@ class SquareRoot extends MathCommand {
       })
       .or(super.parser());
   }
+  deleteTowards(dir: Direction, cursor: Cursor) {
+    if (!this.isEmpty() && dir === 1) {
+      this.moveTowards(R, cursor);
+      cursor.parent.deleteOutOf(L, cursor);
+      return;
+    }
+    // Empty sqrt: delete the sqrt.
+    // Delete-left ("Backspace") moves into non-empty sqrts.
+    super.deleteTowards(dir, cursor);
+  }
 }
 LatexCmds.sqrt = SquareRoot;
 
@@ -1165,6 +1175,9 @@ class NthRoot extends SquareRoot {
         ', End Root'
       );
     }
+  }
+  deleteTowards(dir: Direction, cursor: Cursor) {
+    MathCommand.prototype.deleteTowards.call(this, dir, cursor);
   }
 }
 LatexCmds.nthroot = NthRoot;
