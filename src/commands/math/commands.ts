@@ -1176,6 +1176,9 @@ class NthRoot extends SquareRoot {
       );
     }
   }
+  deleteTowards(dir: Direction, cursor: Cursor) {
+    MathCommand.prototype.deleteTowards.call(this, dir, cursor);
+  }
 }
 LatexCmds.nthroot = NthRoot;
 

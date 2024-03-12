@@ -403,8 +403,7 @@ suite('delete', function () {
     mq.moveToLeftEnd();
 
     //into the radix/degree/index
-    // TODO-test: mq.keystroke('Del'); should work here.
-    mq.keystroke('Right');
+    mq.keystroke('Del');
     assertLatex('\\sqrt[3]{x}');
 
     //remove the 3
