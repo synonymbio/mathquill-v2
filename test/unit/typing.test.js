@@ -418,9 +418,29 @@ suite('typing with auto-replaces', function () {
       });
 
       test('restrictMismatchedBrackets: "none"', function () {
-        mq.config({ restrictMismatchedBrackets: 'none' });
-        mq.typedText('[x)');
-        assertLatex('\\left[\\left(x\\right)\\right]');
+        setup(function () {
+          mq.config({ restrictMismatchedBrackets: 'none' });
+        });
+        test('typing (|x|+1) works', function () {
+          mq.typedText('(|x|+1)');
+          assertLatex('\\left(\\left|x\\right|+1\\right)');
+        });
+        test('typing [x} becomes [{x}]', function () {
+          mq.typedText('[x}');
+          assertLatex('\\left[\\left\\{x\\right\\}\\right]');
+        });
+        test('normal matching pairs {f(n), [a,b]} work', function () {
+          mq.typedText('{f(n), [a,b]}');
+          assertLatex(
+            '\\left\\{f\\left(n\\right),\\ \\left[a,b\\right]\\right\\}'
+          );
+        });
+        test('[a,b) and (a,b] do not match', function () {
+          mq.typedText('[a,b) + (a,b]');
+          assertLatex(
+            '\\left[\\left(x\\right)\\right]\\ +\\ \\left(\\left[x\\right]\\right)'
+          );
+        });
       });
     });
 
