@@ -416,6 +416,12 @@ suite('typing with auto-replaces', function () {
           assertLatex('\\left[a,b\\right)\\ +\\ \\left(a,b\\right]');
         });
       });
+
+      test('restrictMismatchedBrackets: "none"', function () {
+        mq.config({ restrictMismatchedBrackets: 'none' });
+        mq.typedText('[x)');
+        assertLatex('\\left[\\left(x\\right)\\right]');
+      });
     });
 
     suite('pipes', function () {
