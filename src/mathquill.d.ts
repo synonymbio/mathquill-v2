@@ -109,7 +109,7 @@ declare namespace MathQuill {
         select: (text: string) => void;
       };
 
-      restrictMismatchedBrackets?: boolean;
+      restrictMismatchedBrackets?: boolean | 'none';
       typingSlashCreatesNewFraction?: boolean;
       charsThatBreakOutOfSupSub?: string;
       sumStartsWithNEquals?: boolean;

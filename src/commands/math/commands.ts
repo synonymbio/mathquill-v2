@@ -1347,7 +1347,9 @@ class Bracket extends DelimsNode {
         OPP_BRACKS[
           this.sides[this.side as Direction].ch as keyof typeof BRACKET_NAMES
         ] === node.sides[node.side].ch ||
-        { '(': ']', '[': ')' }[this.sides[L].ch] === node.sides[R].ch) &&
+        // if restrictMismatchedBrackets is "none" instead of true, don't allow mismatched range brackets
+        (opts.restrictMismatchedBrackets !== 'none' &&
+          { '(': ']', '[': ')' }[this.sides[L].ch] === node.sides[R].ch)) &&
       node
     );
   }

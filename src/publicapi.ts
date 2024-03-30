@@ -91,7 +91,7 @@ class Options {
   /** Only used in interface versions 1 and 2. */
   substituteKeyboardEvents: SubstituteKeyboardEvents;
 
-  restrictMismatchedBrackets?: boolean;
+  restrictMismatchedBrackets?: boolean | 'none';
   typingSlashCreatesNewFraction?: boolean;
   charsThatBreakOutOfSupSub: string;
   sumStartsWithNEquals?: boolean;
