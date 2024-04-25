@@ -59,7 +59,7 @@ class DigitGroupingChar extends MQSymbol {
     var right: NodeRef = left;
     var spacesFound = 0;
     var dotStreak = 0;
-    var dots = [];
+    var dots: DigitGroupingChar[] = [];
     // traverse right as far as possible (starting to right of this char)
     do {
       if (/^[0-9]$/.test(node.ctrlSeq!)) {
@@ -69,7 +69,7 @@ class DigitGroupingChar extends MQSymbol {
         right = node;
         spacesFound += 1;
         dotStreak = 0;
-      } else if (node.ctrlSeq === DOT) {
+      } else if (node.ctrlSeq === DOT && node instanceof DigitGroupingChar) {
         right = node;
         dots.push(node);
         if (opts.tripleDotsAreEllipsis) {
@@ -88,13 +88,14 @@ class DigitGroupingChar extends MQSymbol {
     // and continue again from the character after the ellipsis.
     if (dotStreak === 3) {
       const rightDot = dots.pop()!;
-      dots.pop()!; // middle dot
+      const middleDot = dots.pop()!;
       const leftDot = dots.pop()!;
       if (rightDot[R] instanceof DigitGroupingChar) {
         DigitGroupingChar.fixDigitGroupingFromLeft(opts, rightDot[R]);
       }
-      // Remove the grouping for the three dots.
-      DigitGroupingChar.removeGroupingBetween(leftDot, right);
+      rightDot.setGroupingClass('mq-ellipsis-end');
+      middleDot.setGroupingClass('mq-ellipsis-middle');
+      leftDot.setGroupingClass('mq-ellipsis-start');
       right = leftDot[L];
     }
     // 2. `!right[R]` or `right[R]` is not a digit grouping char.

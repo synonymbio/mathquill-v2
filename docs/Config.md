@@ -99,7 +99,7 @@ If `enableDigitGrouping` is true, then sequences of digits (and `.`) will have a
 If `tripleDotsAreEllipsis` is true, then `...` is treated as an ellipsis, with the following three changes:
 
 1. Digit grouping re-starts after `...`, so `12345...56789` puts a thin space in both `12345` and `56789`
-2. (TODO) A thin space surrounds `...`, so `123....456` looks more like `123 ... .456`.
+2. A thin space surrounds `...`, so `123....456` looks more like `123 ... .456`.
 3. (TODO) The `...` is not included in automatic fractions, so typing `12...34/` leads to `12...\frac{34}{ }` instead of `\frac{12...34}{ }`.
 
 ## maxDepth

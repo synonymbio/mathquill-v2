@@ -3,6 +3,8 @@
 @digit-separator: .11em;
 @expand-margin: .009em;
 @contract-margin: -.01em;
+@ellipsis-separator: .05em;
+@ellipsis-contract: -0.012em;
 
 .mq-root-block, .mq-math-mode .mq-root-block {
   .inline-block;
@@ -38,8 +40,24 @@
     margin-right: @contract-margin;
   }
 
+  .mq-ellipsis-start {
+    margin-left: @ellipsis-separator;
+    margin-right: @ellipsis-contract;
+  }
+
+  .mq-ellipsis-middle {
+    margin-left: @ellipsis-contract;
+    margin-right: @ellipsis-contract
+  }
+
+  .mq-ellipsis-end {
+    margin-left: @contract-margin;
+    margin-right: @ellipsis-separator;
+  }
+
   &.mq-suppress-grouping {
-    .mq-group-start, .mq-group-other, .mq-group-leading-1, .mq-group-leading-2, .mq-group-leading-3 {
+    .mq-group-start, .mq-group-other, .mq-group-leading-1, .mq-group-leading-2, .mq-group-leading-3,
+    .mq-ellipsis-start, .mq-ellipsis-middle, .mq-ellipsis-end {
       margin-left: @expand-margin;
       margin-right: @expand-margin;
     }
