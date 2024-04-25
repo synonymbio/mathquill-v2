@@ -952,6 +952,8 @@ var LiveFraction =
                 (leftward instanceof Letter &&
                   leftward.endsWord &&
                   cursor.options.infixOperatorNames[leftward.endsWord]) ||
+                (leftward instanceof DigitGroupingChar &&
+                  leftward._groupingClass === 'mq-ellipsis-end') ||
                 leftward instanceof (LatexCmds.text || noop) ||
                 leftward instanceof SummationNotation ||
                 leftward.ctrlSeq === '\\ ' ||
