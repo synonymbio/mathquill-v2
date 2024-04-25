@@ -359,6 +359,21 @@ suite('Digit Grouping', function () {
       },
     });
 
+    mq.latex('.2322');
+    assertClasses(mq, {
+      latex: '.2322',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '2' },
+          { classes: 'mq-digit', content: '3' },
+          { classes: 'mq-digit', content: '2' },
+          { classes: 'mq-digit', content: '2' },
+        ],
+      },
+    });
+
     mq.latex('1.2322');
     assertClasses(mq, {
       latex: '1.2322',
@@ -527,6 +542,150 @@ suite('Digit Grouping', function () {
             classes: 'mq-digit',
             content: '2',
           },
+        ],
+      },
+    });
+
+    mq.latex('12345...67890');
+    assertClasses(mq, {
+      latex: '12345...67890',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          { classes: 'mq-digit', content: '1' },
+          { classes: 'mq-digit', content: '2' },
+          { classes: 'mq-digit', content: '3' },
+          { classes: 'mq-digit', content: '4' },
+          { classes: 'mq-digit', content: '5' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '6' },
+          { classes: 'mq-digit', content: '7' },
+          { classes: 'mq-digit', content: '8' },
+          { classes: 'mq-digit', content: '9' },
+          { classes: 'mq-digit', content: '0' },
+        ],
+      },
+    });
+  });
+
+  test('efficient latex updates - grouping and ellipsis enabled', function () {
+    var mq = MQ.MathField($('<span></span>').appendTo('#mock')[0], {
+      enableDigitGrouping: true,
+      tripleDotsAreEllipsis: true,
+    });
+    mq.latex('12345...67890');
+    assertClasses(mq, {
+      latex: '12345...67890',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          { classes: 'mq-digit mq-group-leading-2', content: '1' },
+          { classes: 'mq-digit mq-group-other', content: '2' },
+          { classes: 'mq-digit mq-group-start', content: '3' },
+          { classes: 'mq-digit mq-group-other', content: '4' },
+          { classes: 'mq-digit mq-group-other', content: '5' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit mq-group-leading-2', content: '6' },
+          { classes: 'mq-digit mq-group-other', content: '7' },
+          { classes: 'mq-digit mq-group-start', content: '8' },
+          { classes: 'mq-digit mq-group-other', content: '9' },
+          { classes: 'mq-digit mq-group-other', content: '0' },
+        ],
+      },
+    });
+    mq.latex('12345....67890');
+    assertClasses(mq, {
+      latex: '12345....67890',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          { classes: 'mq-digit mq-group-leading-2', content: '1' },
+          { classes: 'mq-digit mq-group-other', content: '2' },
+          { classes: 'mq-digit mq-group-start', content: '3' },
+          { classes: 'mq-digit mq-group-other', content: '4' },
+          { classes: 'mq-digit mq-group-other', content: '5' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          // The remaining digits are after the decimal point, so they don't group
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '6' },
+          { classes: 'mq-digit', content: '7' },
+          { classes: 'mq-digit', content: '8' },
+          { classes: 'mq-digit', content: '9' },
+          { classes: 'mq-digit', content: '0' },
+        ],
+      },
+    });
+    mq.latex('1...\\ 6789');
+    assertClasses(mq, {
+      latex: '1...\\ 6789',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          { classes: 'mq-digit', content: '1' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { content: '&nbsp;' },
+          { classes: 'mq-digit mq-group-leading-1', content: '6' },
+          { classes: 'mq-digit mq-group-start', content: '7' },
+          { classes: 'mq-digit mq-group-other', content: '8' },
+          { classes: 'mq-digit mq-group-other', content: '9' },
+        ],
+      },
+    });
+    mq.latex('1...6789.23');
+    assertClasses(mq, {
+      latex: '1...6789.23',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          { classes: 'mq-digit', content: '1' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit mq-group-leading-1', content: '6' },
+          { classes: 'mq-digit mq-group-start', content: '7' },
+          { classes: 'mq-digit mq-group-other', content: '8' },
+          { classes: 'mq-digit mq-group-other', content: '9' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '2' },
+          { classes: 'mq-digit', content: '3' },
+        ],
+      },
+    });
+    mq.latex('12345...67890...12345');
+    assertClasses(mq, {
+      latex: '12345...67890...12345',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          { classes: 'mq-digit mq-group-leading-2', content: '1' },
+          { classes: 'mq-digit mq-group-other', content: '2' },
+          { classes: 'mq-digit mq-group-start', content: '3' },
+          { classes: 'mq-digit mq-group-other', content: '4' },
+          { classes: 'mq-digit mq-group-other', content: '5' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit mq-group-leading-2', content: '6' },
+          { classes: 'mq-digit mq-group-other', content: '7' },
+          { classes: 'mq-digit mq-group-start', content: '8' },
+          { classes: 'mq-digit mq-group-other', content: '9' },
+          { classes: 'mq-digit mq-group-other', content: '0' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit mq-group-leading-2', content: '1' },
+          { classes: 'mq-digit mq-group-other', content: '2' },
+          { classes: 'mq-digit mq-group-start', content: '3' },
+          { classes: 'mq-digit mq-group-other', content: '4' },
+          { classes: 'mq-digit mq-group-other', content: '5' },
         ],
       },
     });
