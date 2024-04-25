@@ -639,9 +639,42 @@ suite('Digit Grouping', function () {
         ],
       },
     });
-    mq.latex('1...6789.23');
+    mq.latex('12345.\\ ..6789');
     assertClasses(mq, {
-      latex: '1...6789.23',
+      latex: '12345.\\ ..6789',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          { classes: 'mq-digit', content: '1' },
+          { classes: 'mq-digit', content: '2' },
+          { classes: 'mq-digit', content: '3' },
+          { classes: 'mq-digit', content: '4' },
+          { classes: 'mq-digit', content: '5' },
+          { classes: 'mq-digit', content: '.' },
+          { content: '&nbsp;' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '.' },
+          { classes: 'mq-digit', content: '6' },
+          { classes: 'mq-digit', content: '7' },
+          { classes: 'mq-digit', content: '8' },
+          { classes: 'mq-digit', content: '9' },
+        ],
+      },
+    });
+    const n6789_2345 = [
+      { classes: 'mq-digit mq-group-leading-1', content: '6' },
+      { classes: 'mq-digit mq-group-start', content: '7' },
+      { classes: 'mq-digit mq-group-other', content: '8' },
+      { classes: 'mq-digit mq-group-other', content: '9' },
+      { classes: 'mq-digit', content: '.' },
+      { classes: 'mq-digit', content: '2' },
+      { classes: 'mq-digit', content: '3' },
+      { classes: 'mq-digit', content: '4' },
+      { classes: 'mq-digit', content: '5' },
+    ];
+    mq.latex('1...6789.2345');
+    assertClasses(mq, {
+      latex: '1...6789.2345',
       tree: {
         classes: 'mq-root-block',
         content: [
@@ -649,13 +682,38 @@ suite('Digit Grouping', function () {
           { classes: 'mq-digit mq-ellipsis-start', content: '.' },
           { classes: 'mq-digit mq-ellipsis-middle', content: '.' },
           { classes: 'mq-digit mq-ellipsis-end', content: '.' },
+          ...n6789_2345,
+        ],
+      },
+    });
+    mq.latex('6789.2345...6789.2345');
+    assertClasses(mq, {
+      latex: '6789.2345...6789.2345',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          ...n6789_2345,
+          { classes: 'mq-digit mq-ellipsis-start', content: '.' },
+          { classes: 'mq-digit mq-ellipsis-middle', content: '.' },
+          { classes: 'mq-digit mq-ellipsis-end', content: '.' },
+          ...n6789_2345,
+        ],
+      },
+    });
+    mq.latex('6789.2345...6789');
+    assertClasses(mq, {
+      latex: '6789.2345...6789',
+      tree: {
+        classes: 'mq-root-block',
+        content: [
+          ...n6789_2345,
+          { classes: 'mq-digit mq-ellipsis-start', content: '.' },
+          { classes: 'mq-digit mq-ellipsis-middle', content: '.' },
+          { classes: 'mq-digit mq-ellipsis-end', content: '.' },
           { classes: 'mq-digit mq-group-leading-1', content: '6' },
           { classes: 'mq-digit mq-group-start', content: '7' },
           { classes: 'mq-digit mq-group-other', content: '8' },
           { classes: 'mq-digit mq-group-other', content: '9' },
-          { classes: 'mq-digit', content: '.' },
-          { classes: 'mq-digit', content: '2' },
-          { classes: 'mq-digit', content: '3' },
         ],
       },
     });
