@@ -104,6 +104,7 @@ class Options {
   resetCursorOnBlur?: boolean | undefined;
   leftRightIntoCmdGoes?: 'up' | 'down';
   enableDigitGrouping?: boolean;
+  tripleDotsAreEllipsis?: boolean;
   mouseEvents?: boolean;
   maxDepth?: number;
   disableCopyPaste?: boolean;

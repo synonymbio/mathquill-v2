@@ -92,6 +92,16 @@ This defaults to being empty.
 
 Just like [`autoCommands`](#autocommands) above, this takes a string formatted as a space-delimited list of LaTeX commands.
 
+## enableDigitGrouping and tripleDotsAreEllipsis
+
+If `enableDigitGrouping` is true, then sequences of digits (and `.`) will have a thin space every three digits. If a sequence of digits has exactly one `.`, then the spacing will only be in the whole number part (before the `.`). If a sequence of digits contains more than one `.`, or at least one space, then digit grouping is always disabled for that sequence.
+
+If `tripleDotsAreEllipsis` is true, then `...` is treated as an ellipsis, with the following three changes:
+
+1. Digit grouping re-starts after `...`, so `12345...56789` puts a thin space in both `12345` and `56789`
+2. A thin space surrounds `...`, so `123....456` looks more like `123 ... .456`.
+3. The `...` is not included in automatic fractions, so typing `12...34/` leads to `12...\frac{34}{ }` instead of `\frac{12...34}{ }`.
+
 ## maxDepth
 
 `maxDepth` specifies the maximum number of nested MathBlocks. When `maxDepth` is set to 1, the user can type simple math symbols directly into the editor but not into nested MathBlocks, e.g. the numerator and denominator of a fraction.

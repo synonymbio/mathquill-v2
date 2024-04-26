@@ -61,6 +61,15 @@ suite('typing with auto-replaces', function () {
       mq_basic.typedText('1/2');
       assert.equal(mq_basic.latex(), '\\frac{1}{2}');
     });
+
+    test('digit grouping ellipsis affects LiveFraction', () => {
+      mq.config({
+        enableDigitGrouping: true,
+        tripleDotsAreEllipsis: true,
+      });
+      mq.typedText('1...2/');
+      assertLatex('1...\\frac{2}{ }');
+    });
   });
 
   suite('Choose', function () {
