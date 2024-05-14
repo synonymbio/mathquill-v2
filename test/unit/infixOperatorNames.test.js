@@ -46,6 +46,9 @@ suite('infixOperatorNames', function () {
   test('minus after height is minus', function () {
     mq.typedText('theight-');
     assertAriaEqual('minus');
+    var t = $('#mock var.mq-operator-name:last');
+    assert.equal(t.text(), 't');
+    assert.ok(!t.is('.mq-last'));
   });
 
   test('minus after sin is minus', function () {
@@ -54,10 +57,16 @@ suite('infixOperatorNames', function () {
     // width, min, length, etc. Behavior after erf, corr, etc. doesn't matter.
     mq.typedText('tsin-');
     assertAriaEqual('minus');
+    var n = $('#mock var.mq-operator-name:last');
+    assert.equal(n.text(), 'n');
+    assert.ok(!n.is('.mq-last'));
   });
 
   test('minus after for is negative', function () {
     mq.typedText('tfor-');
     assertAriaEqual('negative');
+    var r = $('#mock var.mq-operator-name:last');
+    assert.equal(r.text(), 'r');
+    assert.ok(r.is('.mq-last'));
   });
 });

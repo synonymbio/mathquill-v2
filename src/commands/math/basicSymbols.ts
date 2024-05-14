@@ -619,7 +619,7 @@ class Letter extends Variable {
 
     // do not add padding between letter and binary operator. The
     // binary operator already has padding
-    if (node instanceof BinaryOperator) return true;
+    if (node instanceof BinaryOperator && node.isBinaryOperator()) return true;
 
     if (node instanceof SummationNotation) return true;
 
@@ -1168,6 +1168,10 @@ function plusMinusIsBinaryOperator(node: NodeRef): boolean {
 var PlusMinus = class extends BinaryOperator {
   constructor(ch?: string, html?: ChildNode, mathspeak?: string) {
     super(ch, html, undefined, mathspeak, true);
+  }
+
+  isBinaryOperator(): boolean {
+    return plusMinusIsBinaryOperator(this);
   }
 
   contactWeld(cursor: Cursor, dir?: Direction) {
