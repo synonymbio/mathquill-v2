@@ -395,8 +395,10 @@ function letterSequenceEndingAtNode(node: NodeRef, maxLength: number) {
 class Letter extends Variable {
   letter: string;
   /** If this is the last letter of an operatorname (`\operatorname{arcsinh}`)
-   * or builtin (`\sin`), give its name, e.g. `arcsinh` or `sin`. */
-  endsInfixOperator?: boolean;
+   * or builtin (`\sin`), give its category, based on infixOperatorNames
+   * and prefixOperatorNames. E.g. "for" may be infix and "sin" may be prefix.
+   */
+  endsCategory?: undefined | 'infix' | 'prefix';
 
   constructor(ch: string) {
     super(ch);
@@ -484,7 +486,7 @@ class Letter extends Variable {
   italicize(bool: boolean) {
     this.isItalic = bool;
     this.isPartOfOperator = !bool;
-    if (bool) delete this.endsInfixOperator;
+    if (bool) delete this.endsCategory;
     this.domFrag().toggleClass('mq-operator-name', !bool);
     return this;
   }
@@ -567,7 +569,9 @@ class Letter extends Variable {
             (isBuiltIn ? '\\' : '\\operatorname{') + first.ctrlSeq;
           last.ctrlSeq += isBuiltIn ? ' ' : '}';
           if (opts.infixOperatorNames[word]) {
-            last.endsInfixOperator = true;
+            last.endsCategory = 'infix';
+          } else if (opts.prefixOperatorNames[word]) {
+            last.endsCategory = 'prefix';
           }
 
           if (TwoWordOpNames.hasOwnProperty(word)) {
@@ -715,8 +719,12 @@ baseOptionProcessors.autoOperatorNames = function (cmds) {
 };
 
 Options.prototype.infixOperatorNames = {};
+baseOptionProcessors.infixOperatorNames = splitWordsIntoDict;
 
-baseOptionProcessors.infixOperatorNames = function (cmds) {
+Options.prototype.prefixOperatorNames = {};
+baseOptionProcessors.prefixOperatorNames = splitWordsIntoDict;
+
+function splitWordsIntoDict(cmds: unknown) {
   if (typeof cmds !== 'string') {
     throw '"' + cmds + '" not a space-delimited list';
   }
@@ -733,7 +741,7 @@ baseOptionProcessors.infixOperatorNames = function (cmds) {
     dict[cmd] = true;
   }
   return dict;
-};
+}
 
 class OperatorName extends MQSymbol {
   ctrlSeq: string;
@@ -1128,7 +1136,7 @@ LatexCmds['√'] = () => new LatexFragment('\\sqrt{}');
 function nodeEndsBinaryOperator(node: NodeRef): boolean {
   return (
     node instanceof BinaryOperator ||
-    (node instanceof Letter && !!node.endsInfixOperator)
+    (node instanceof Letter && node.endsCategory == 'infix')
   );
 }
 
@@ -1145,6 +1153,7 @@ function plusMinusIsBinaryOperator(node: NodeRef): boolean {
     // consider the operator to be unary
     if (
       nodeEndsBinaryOperator(nodeL) ||
+      (nodeL instanceof Letter && nodeL.endsCategory == 'prefix') ||
       /^(\\ )|[,;:\(\[]$/.test(nodeL.ctrlSeq!)
     ) {
       return false;

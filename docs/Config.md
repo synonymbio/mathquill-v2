@@ -94,6 +94,12 @@ This defaults to being empty.
 
 Just like [`autoCommands`](#autocommands) above, this takes a string formatted as a space-delimited list of LaTeX commands.
 
+## prefixOperatorNames
+
+`prefixOperatorNames` specifies a set of operator names that appear as prefix operators. A minus sign after a prefix operator is treated as a negative, instead of a binary subtraction.
+
+For example, Desmos includes `sin` in this option, so typing `sin -1` doesn't look like `sin - 1`.
+
 ## enableDigitGrouping and tripleDotsAreEllipsis
 
 If `enableDigitGrouping` is true, then sequences of digits (and `.`) will have a thin space every three digits. If a sequence of digits has exactly one `.`, then the spacing will only be in the whole number part (before the `.`). If a sequence of digits contains more than one `.`, or at least one space, then digit grouping is always disabled for that sequence.

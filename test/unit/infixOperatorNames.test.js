@@ -4,7 +4,8 @@ suite('infixOperatorNames', function () {
   setup(function () {
     const autoOperatorNames = 'arcsinh sin height with for';
     const infixOperatorNames = 'with for';
-    const opts = { autoOperatorNames, infixOperatorNames };
+    const prefixOperatorNames = 'sin ln log';
+    const opts = { autoOperatorNames, infixOperatorNames, prefixOperatorNames };
     mq = MQ.MathField($('<span></span>').appendTo('#mock')[0], opts);
   });
 
@@ -52,14 +53,11 @@ suite('infixOperatorNames', function () {
   });
 
   test('minus after sin is minus', function () {
-    // TODO-jared-for-negative: minus after sin _should_ be negative
-    // Same holds for ln, log, and all trig (cos, arcsinh, etc.), but not
-    // width, min, length, etc. Behavior after erf, corr, etc. doesn't matter.
     mq.typedText('tsin-');
-    assertAriaEqual('minus');
+    assertAriaEqual('negative');
     var n = $('#mock var.mq-operator-name:last');
     assert.equal(n.text(), 'n');
-    assert.ok(!n.is('.mq-last'));
+    assert.ok(n.is('.mq-last'));
   });
 
   test('minus after for is negative', function () {
