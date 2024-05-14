@@ -396,7 +396,7 @@ class Letter extends Variable {
   letter: string;
   /** If this is the last letter of an operatorname (`\operatorname{arcsinh}`)
    * or builtin (`\sin`), give its name, e.g. `arcsinh` or `sin`. */
-  endsWord?: string;
+  endsInfixOperator?: boolean;
 
   constructor(ch: string) {
     super(ch);
@@ -484,7 +484,7 @@ class Letter extends Variable {
   italicize(bool: boolean) {
     this.isItalic = bool;
     this.isPartOfOperator = !bool;
-    if (bool) delete this.endsWord;
+    if (bool) delete this.endsInfixOperator;
     this.domFrag().toggleClass('mq-operator-name', !bool);
     return this;
   }
@@ -566,7 +566,9 @@ class Letter extends Variable {
           first.ctrlSeq =
             (isBuiltIn ? '\\' : '\\operatorname{') + first.ctrlSeq;
           last.ctrlSeq += isBuiltIn ? ' ' : '}';
-          last.endsWord = word;
+          if (opts.infixOperatorNames[word]) {
+            last.endsInfixOperator = true;
+          }
 
           if (TwoWordOpNames.hasOwnProperty(word)) {
             const lastL = last[L];
