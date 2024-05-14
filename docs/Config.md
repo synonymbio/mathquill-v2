@@ -88,6 +88,8 @@ Just like [`autoCommands`](#autocommands) above, this takes a string formatted a
 
 For example, [Desmos](https://www.desmos.com/calculator) includes `for` in this option, so typing `(t,t) for 1/2 < t < 1` becomes `(t,t) for \frac{1}{2} < t < 1` and not `\frac{(t,t) for 1}{2} < t < 1`.
 
+Also, a minus sign (`-`) after an infix operator is treated as prefix, so `(t,t) for -1 < t < 1` doesn't look like `(t,t) for - 1 < t < 1`.
+
 This defaults to being empty.
 
 Just like [`autoCommands`](#autocommands) above, this takes a string formatted as a space-delimited list of LaTeX commands.

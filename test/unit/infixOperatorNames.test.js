@@ -2,7 +2,7 @@ suite('infixOperatorNames', function () {
   const $ = window.test_only_jquery;
   var mq;
   setup(function () {
-    const autoOperatorNames = 'arcsinh sin with for';
+    const autoOperatorNames = 'arcsinh sin height with for';
     const infixOperatorNames = 'with for';
     const opts = { autoOperatorNames, infixOperatorNames };
     mq = MQ.MathField($('<span></span>').appendTo('#mock')[0], opts);
@@ -14,6 +14,10 @@ suite('infixOperatorNames', function () {
   function assertLatex(latex) {
     prayWellFormedPoint(mq.__controller.cursor);
     assert.equal(mq.latex(), latex);
+  }
+
+  function assertAriaEqual(alertText) {
+    assert.equal(mq.__controller.aria.msg, alertText);
   }
 
   test('for stops scanning', function () {
@@ -37,5 +41,23 @@ suite('infixOperatorNames', function () {
     assertLatex('tor1');
     mq.keystroke('End').typedText('/');
     assertLatex('\\frac{tor1}{ }');
+  });
+
+  test('minus after height is minus', function () {
+    mq.typedText('theight-');
+    assertAriaEqual('minus');
+  });
+
+  test('minus after sin is minus', function () {
+    // TODO-jared-for-negative: minus after sin _should_ be negative
+    // Same holds for ln, log, and all trig (cos, arcsinh, etc.), but not
+    // width, min, length, etc. Behavior after erf, corr, etc. doesn't matter.
+    mq.typedText('tsin-');
+    assertAriaEqual('minus');
+  });
+
+  test('minus after for is negative', function () {
+    mq.typedText('tfor-');
+    assertAriaEqual('negative');
   });
 });

@@ -1125,6 +1125,13 @@ LatexCmds['¾'] = () => new LatexFragment('\\frac34');
 // around handling valid latex as latex rather than treating it as keystrokes.
 LatexCmds['√'] = () => new LatexFragment('\\sqrt{}');
 
+function nodeEndsBinaryOperator(node: NodeRef): boolean {
+  return (
+    node instanceof BinaryOperator ||
+    (node instanceof Letter && !!node.endsInfixOperator)
+  );
+}
+
 // Binary operator determination is used in several contexts for PlusMinus nodes and their descendants.
 // For instance, we set the item's class name based on this factor, and also assign different mathspeak values (plus vs positive, negative vs minus).
 function plusMinusIsBinaryOperator(node: NodeRef): boolean {
@@ -1137,7 +1144,7 @@ function plusMinusIsBinaryOperator(node: NodeRef): boolean {
     // or an open bracket (open parenthesis, open square bracket)
     // consider the operator to be unary
     if (
-      nodeL instanceof BinaryOperator ||
+      nodeEndsBinaryOperator(nodeL) ||
       /^(\\ )|[,;:\(\[]$/.test(nodeL.ctrlSeq!)
     ) {
       return false;
