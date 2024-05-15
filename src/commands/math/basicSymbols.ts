@@ -395,8 +395,10 @@ function letterSequenceEndingAtNode(node: NodeRef, maxLength: number) {
 class Letter extends Variable {
   letter: string;
   /** If this is the last letter of an operatorname (`\operatorname{arcsinh}`)
-   * or builtin (`\sin`), give its name, e.g. `arcsinh` or `sin`. */
-  endsWord?: string;
+   * or builtin (`\sin`), give its category, based on infixOperatorNames
+   * and prefixOperatorNames. E.g. "for" may be infix and "sin" may be prefix.
+   */
+  endsCategory?: undefined | 'infix' | 'prefix';
 
   constructor(ch: string) {
     super(ch);
@@ -484,7 +486,7 @@ class Letter extends Variable {
   italicize(bool: boolean) {
     this.isItalic = bool;
     this.isPartOfOperator = !bool;
-    if (bool) delete this.endsWord;
+    if (bool) delete this.endsCategory;
     this.domFrag().toggleClass('mq-operator-name', !bool);
     return this;
   }
@@ -566,7 +568,11 @@ class Letter extends Variable {
           first.ctrlSeq =
             (isBuiltIn ? '\\' : '\\operatorname{') + first.ctrlSeq;
           last.ctrlSeq += isBuiltIn ? ' ' : '}';
-          last.endsWord = word;
+          if (opts.infixOperatorNames[word]) {
+            last.endsCategory = 'infix';
+          } else if (opts.prefixOperatorNames[word]) {
+            last.endsCategory = 'prefix';
+          }
 
           if (TwoWordOpNames.hasOwnProperty(word)) {
             const lastL = last[L];
@@ -617,7 +623,7 @@ class Letter extends Variable {
 
     // do not add padding between letter and binary operator. The
     // binary operator already has padding
-    if (node instanceof BinaryOperator) return true;
+    if (node instanceof BinaryOperator && node.isBinaryOperator()) return true;
 
     if (node instanceof SummationNotation) return true;
 
@@ -713,8 +719,12 @@ baseOptionProcessors.autoOperatorNames = function (cmds) {
 };
 
 Options.prototype.infixOperatorNames = {};
+baseOptionProcessors.infixOperatorNames = splitWordsIntoDict;
 
-baseOptionProcessors.infixOperatorNames = function (cmds) {
+Options.prototype.prefixOperatorNames = {};
+baseOptionProcessors.prefixOperatorNames = splitWordsIntoDict;
+
+function splitWordsIntoDict(cmds: unknown) {
   if (typeof cmds !== 'string') {
     throw '"' + cmds + '" not a space-delimited list';
   }
@@ -731,7 +741,7 @@ baseOptionProcessors.infixOperatorNames = function (cmds) {
     dict[cmd] = true;
   }
   return dict;
-};
+}
 
 class OperatorName extends MQSymbol {
   ctrlSeq: string;
@@ -1123,6 +1133,13 @@ LatexCmds['¾'] = () => new LatexFragment('\\frac34');
 // around handling valid latex as latex rather than treating it as keystrokes.
 LatexCmds['√'] = () => new LatexFragment('\\sqrt{}');
 
+function nodeEndsBinaryOperator(node: NodeRef): boolean {
+  return (
+    node instanceof BinaryOperator ||
+    (node instanceof Letter && node.endsCategory == 'infix')
+  );
+}
+
 // Binary operator determination is used in several contexts for PlusMinus nodes and their descendants.
 // For instance, we set the item's class name based on this factor, and also assign different mathspeak values (plus vs positive, negative vs minus).
 function plusMinusIsBinaryOperator(node: NodeRef): boolean {
@@ -1135,7 +1152,8 @@ function plusMinusIsBinaryOperator(node: NodeRef): boolean {
     // or an open bracket (open parenthesis, open square bracket)
     // consider the operator to be unary
     if (
-      nodeL instanceof BinaryOperator ||
+      nodeEndsBinaryOperator(nodeL) ||
+      (nodeL instanceof Letter && nodeL.endsCategory == 'prefix') ||
       /^(\\ )|[,;:\(\[]$/.test(nodeL.ctrlSeq!)
     ) {
       return false;
@@ -1159,6 +1177,10 @@ function plusMinusIsBinaryOperator(node: NodeRef): boolean {
 var PlusMinus = class extends BinaryOperator {
   constructor(ch?: string, html?: ChildNode, mathspeak?: string) {
     super(ch, html, undefined, mathspeak, true);
+  }
+
+  isBinaryOperator(): boolean {
+    return plusMinusIsBinaryOperator(this);
   }
 
   contactWeld(cursor: Cursor, dir?: Direction) {

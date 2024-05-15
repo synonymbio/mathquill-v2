@@ -461,6 +461,13 @@ class BinaryOperator extends MQSymbol {
       );
     }
   }
+
+  /**
+   * PlusMinus overrides this to be false when it looks like unary positive/negative.
+   */
+  isBinaryOperator() {
+    return true;
+  }
 }
 function bindBinaryOperator(
   ctrlSeq?: string,

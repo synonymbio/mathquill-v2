@@ -948,10 +948,7 @@ var LiveFraction =
             while (
               leftward &&
               !(
-                leftward instanceof BinaryOperator ||
-                (leftward instanceof Letter &&
-                  leftward.endsWord &&
-                  cursor.options.infixOperatorNames[leftward.endsWord]) ||
+                nodeEndsBinaryOperator(leftward) ||
                 (leftward instanceof DigitGroupingChar &&
                   leftward._groupingClass === 'mq-ellipsis-end') ||
                 leftward instanceof (LatexCmds.text || noop) ||
