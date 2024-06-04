@@ -1133,6 +1133,12 @@ LatexCmds['¾'] = () => new LatexFragment('\\frac34');
 // around handling valid latex as latex rather than treating it as keystrokes.
 LatexCmds['√'] = () => new LatexFragment('\\sqrt{}');
 
+/**
+ * Return true if:
+ * - node is BinaryOperator (+, ×, -, etc), including PlusMinus which could
+ *   siometimes be interpreted as unary, or
+ * - node ends an infix word like "for" specified in `infixOperatorNames`
+ */
 function nodeEndsBinaryOperator(node: NodeRef): boolean {
   return (
     node instanceof BinaryOperator ||
@@ -1148,13 +1154,13 @@ function plusMinusIsBinaryOperator(node: NodeRef): boolean {
   const nodeL = node[L];
 
   if (nodeL) {
-    // If the left sibling is a binary operator or a separator (comma, semicolon, colon, space)
-    // or an open bracket (open parenthesis, open square bracket)
+    // If the left sibling is a binary operator or a separator (comma, semicolon, colon, space),
     // consider the operator to be unary
     if (
       nodeEndsBinaryOperator(nodeL) ||
       (nodeL instanceof Letter && nodeL.endsCategory == 'prefix') ||
-      /^(\\ )|[,;:\(\[]$/.test(nodeL.ctrlSeq!)
+      (!(nodeL instanceof Bracket) && // exclude Bracket because ctrlSeq gives "(" even if `node` is after the ")"
+        /^(\\ )|[,;:\(\[]$/.test(nodeL.ctrlSeq!))
     ) {
       return false;
     }
@@ -1168,6 +1174,9 @@ function plusMinusIsBinaryOperator(node: NodeRef): boolean {
     //this allows style blocks to be transparent for unary/binary purposes
     return plusMinusIsBinaryOperator(node.parent.parent);
   } else {
+    // This is reached when `node` is the first element in the MathBlock, for
+    // example `node` is after an open bracket. E.g. `node` is "-" inside "(-5)".
+    // Then `nodeL` is undefined since `node` is the start of the block.
     return false;
   }
 
