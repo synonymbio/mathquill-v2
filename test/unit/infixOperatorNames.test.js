@@ -67,4 +67,14 @@ suite('infixOperatorNames', function () {
     assert.equal(r.text(), 'r');
     assert.ok(r.is('.mq-last'));
   });
+
+  test('minus after close-paren is minus', function () {
+    mq.typedText('(x)-');
+    assertAriaEqual('minus');
+  });
+
+  test('minus after open-paren is negative', function () {
+    mq.typedText('(-');
+    assertAriaEqual('negative');
+  });
 });
