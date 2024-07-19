@@ -1475,3 +1475,62 @@ baseOptionProcessors.interpretTildeAsSim = function (val: boolean | undefined) {
   }
   return interpretAsSim;
 };
+
+LatexCmds['◯'] = LatexCmds.bigcirc = bindVanillaSymbol(
+  '\\bigcirc ',
+  '&#9711;',
+  'circle'
+);
+
+LatexCmds['∠'] =
+  LatexCmds.ang =
+  LatexCmds.angle =
+    bindVanillaSymbol('\\angle ', '&ang;', 'angle');
+
+// Using degree instead of ^\circ for compatibility
+// with a pasted in unicode degree symbol
+LatexCmds['°'] = LatexCmds.degree = bindVanillaSymbol(
+  '\\degree ',
+  '&deg;',
+  'degrees'
+);
+
+LatexCmds['△'] = LatexCmds.triangle = bindVanillaSymbol(
+  '\\triangle ',
+  '&#9651;',
+  'triangle'
+);
+
+LatexCmds['≅'] = LatexCmds.cong = bindBinaryOperator(
+  '\\cong ',
+  '&cong;',
+  'cong',
+  'congruent'
+);
+
+LatexCmds['∡'] = LatexCmds.measuredangle = bindVanillaSymbol(
+  '\\measuredangle ',
+  '&#8737;',
+  'measured angle'
+);
+
+//not real LaTex command see https://github.com/mathquill/mathquill/pull/552 for more details
+LatexCmds['▱'] = LatexCmds.parallelogram = bindVanillaSymbol(
+  '\\parallelogram ',
+  '&#9649;',
+  'parallelogram'
+);
+
+LatexCmds['≇'] = LatexCmds.ncong = bindBinaryOperator(
+  '\\ncong ',
+  '&ncong;',
+  'ncong',
+  'not congruent'
+);
+
+LatexCmds['≁'] = LatexCmds.nsim = bindBinaryOperator(
+  '\\nsim ',
+  '&nsim;',
+  'nsim',
+  'not similar'
+);
