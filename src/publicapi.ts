@@ -386,7 +386,10 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       let bracketNodes: Bracket[] = [];
 
       this.__controller.root.postOrder(function (node) {
-        const nodeIsQuote = (node instanceof VanillaSymbol) && (node.textTemplate[0] === '"' || node.textTemplate[0] === "'");
+        const nodeIsQuote = (node instanceof VanillaSymbol) &&
+          (node.textTemplate[0] === '"' || node.textTemplate[0] === "'");
+
+        const nodeIsPeriod = node instanceof DigitGroupingChar && node.textTemplate[0] === '.';
 
         // First, check for any state transitions due to the current token.
         // A letter can start a new object.
@@ -397,7 +400,7 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
         } else if (node instanceof Letter && cursorState === 'period') {
           cursorState = 'property';
         // A period is a delimiter between an object and a property, or a property and a property.
-        } else if (node instanceof DigitGroupingChar && node.textTemplate[0] === '.') {
+        } else if (nodeIsPeriod) {
           if (cursorState === 'object' || cursorState === 'property') {
             cursorState = 'period';
           }
@@ -408,10 +411,16 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
             identifier = [];
           }
         } else {
+          const nodeBeforeIsPeriod = node[L] && node[L] instanceof DigitGroupingChar && node[L].textTemplate[0] === '.';
+          const nodeBeforeIsQuote = node[L] && node[L] instanceof VanillaSymbol && (node[L].textTemplate[0] === '"' || node[L].textTemplate[0] === "'");
+          const nodeBeforeIsValidToken =
+            node[L] && node[L] instanceof Letter || node[L] instanceof Digit || nodeBeforeIsPeriod || nodeBeforeIsQuote;
+          // Is this the end of a string literal?
           if (cursorState === 'literal' && !(nodeIsQuote || node instanceof Letter || node instanceof Digit)) {
             cursorState = 'none';
             identifiers.push(identifier);
-          } else if (!(node instanceof Letter || node instanceof Digit) && cursorState !== 'none') {
+          // Is this the end of an identifier?
+          } else if ((!nodeBeforeIsValidToken || !(node instanceof Letter || node instanceof Digit)) && cursorState !== 'none') {
             cursorState = 'none';
             identifiers.push(identifier);
           }
@@ -456,7 +465,10 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
 
         // Keep track of any bracket nodes encountered.
         if (node instanceof Bracket) {
-          bracketNodes.push(node);
+          const isUnitBrace = node.textTemplate[0] === '{';
+          if (isUnitBrace) {
+            bracketNodes.push(node);
+          }
         }
       });
 
