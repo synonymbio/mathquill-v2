@@ -2,11 +2,12 @@
  * The publicly exposed MathQuill API.
  ********************************************************/
 
+// Represents one character that belongs to an identifier.
 interface IdentifierToken {
   id: string | number
   text: string
-  type: 'letter' | 'number' | 'underscore' | 'period'
-  belongsTo: 'object' | 'property' | 'period'
+  type: 'letter' | 'number' | 'underscore' | 'period' | 'quote' | 'unknown'
+  belongsTo: 'object' | 'property' | 'period' | 'literal' | 'none'
   element: Element | Text | undefined
   setElement: (element: Element | Text | undefined) => void
 }
@@ -368,56 +369,110 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       this.__controller.getTextareaOrThrow().blur();
       return this;
     }
-    semanticParse() {
+    /**
+     * Detects semantic types like objects, object properties, and string literals.
+     * 
+     * Nodes in the tree are given classes to indicate their semantic type,
+     * allowing them to be targeted with CSS selectors.
+     * 
+     * @returns An array of arrays of IdentifierTokens. Each item in the array
+     * is an identifier made up of tokens. Those tokens are labelled with their
+     * semantic type.
+     */
+    parseSemanticTypes() {
       const identifiers: IdentifierToken[][] = [];
       let identifier: IdentifierToken[] = [];
-
-      let cursorState: 'object' | 'property' | 'period' | 'none' = 'none';
+      let cursorState: 'object' | 'property' | 'period' | 'none' | 'literal' = 'none';
+      let bracketNodes: Bracket[] = [];
 
       this.__controller.root.postOrder(function (node) {
-        console.log(node);
+        const nodeIsQuote = (node instanceof VanillaSymbol) && (node.textTemplate[0] === '"' || node.textTemplate[0] === "'");
 
         // First, check for any state transitions due to the current token.
         // A letter can start a new object.
         if (node instanceof Letter && (cursorState === 'none')) {
-          console.debug("Letter, starting a new object");
           cursorState = 'object';
           identifier = [];
         // A letter after a period is the start of a property.
         } else if (node instanceof Letter && cursorState === 'period') {
-          console.debug("Last char was period, starting a new property");
           cursorState = 'property';
         // A period is a delimiter between an object and a property, or a property and a property.
         } else if (node instanceof DigitGroupingChar && node.textTemplate[0] === '.') {
           if (cursorState === 'object' || cursorState === 'property') {
-            console.debug("Period");
             cursorState = 'period';
           }
+        // A quote is the start of a string literal.
+        } else if (nodeIsQuote) {
+          if (cursorState !== 'literal') {
+            cursorState = 'literal';
+            identifier = [];
+          }
         } else {
-          if (!(node instanceof Letter || node instanceof Digit) && cursorState !== 'none') {
-            console.debug("End of identifier");
+          if (cursorState === 'literal' && !(nodeIsQuote || node instanceof Letter || node instanceof Digit)) {
+            cursorState = 'none';
+            identifiers.push(identifier);
+          } else if (!(node instanceof Letter || node instanceof Digit) && cursorState !== 'none') {
             cursorState = 'none';
             identifiers.push(identifier);
           }
         }
 
         // If we're in the middle of an identifier, keep adding to it.
-        if (cursorState === 'object' || cursorState === 'property' || cursorState === 'period') {
+        if (cursorState === 'object' || cursorState === 'property' || cursorState === 'period' || cursorState === 'literal') {
+          const element = node.getDOM();
+          if (element instanceof Element) {
+            if (cursorState === 'object') {
+              element.classList.add('mq-identifier');
+              element.classList.add('mq-identifier-object');
+            } else if (cursorState === 'property') {
+              element.classList.add('mq-identifier');
+              element.classList.add('mq-identifier-property');
+            } else if (cursorState === 'period') {
+              element.classList.add('mq-identifier');
+              element.classList.add('mq-identifier-period');
+            } else if (cursorState === 'literal') {
+              element.classList.add('mq-literal');
+            }
+          }
+          const text = node instanceof Letter ? node.letter :
+                       node instanceof Digit || node instanceof DigitGroupingChar ? node.textTemplate[0] :
+                       node instanceof VanillaSymbol && (node.textTemplate[0] === '"' || node.textTemplate[0] === "'") ? node.textTemplate[0] :
+                       'unknown';
+          const type = node instanceof Letter ? 'letter' :
+                      node instanceof Digit ? 'number' :
+                      node instanceof DigitGroupingChar && node.textTemplate[0] === '.' ? 'period' :
+                      node instanceof DigitGroupingChar && node.textTemplate[0] === '_' ? 'underscore' :
+                      node instanceof VanillaSymbol && (node.textTemplate[0] === '"' || node.textTemplate[0] === "'") ? 'quote' :
+                      'unknown';
           identifier.push({
             id: node.id,
-            text: node instanceof Letter ? node.letter :
-                  node instanceof Digit || node instanceof DigitGroupingChar ? node.textTemplate[0] : '',
-            type: 'letter',
+            text: text,
+            type: type,
             belongsTo: cursorState,
             element: node.getDOM(),
             setElement: node.setDOM,
           });
         }
+
+        // Keep track of any bracket nodes encountered.
+        if (node instanceof Bracket) {
+          bracketNodes.push(node);
+        }
       });
 
-      return {
-        identifiers: identifiers,
-      };
+      // Label any descendents of bracket nodes.
+      for (const bracketNode of bracketNodes) {
+        bracketNode.postOrder(function (node) {
+          if (node instanceof Letter || node instanceof Digit) {
+            const element = node.getDOM();
+            if (element instanceof Element && element.classList.contains('mq-identifier')) {
+              element.classList.add('mq-units');
+            }
+          }
+        });
+      }
+
+      return identifiers;
     }
   }
 

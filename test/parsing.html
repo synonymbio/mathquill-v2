@@ -39,6 +39,16 @@
       .syntex-dot {
         color: gray;
       }
+
+      .mq-identifier {
+        color: red;
+      }
+      .mq-units {
+        color: purple;
+      }
+      .mq-literal {
+        color: orange;
+      }
     </style>
   </head>
   <body>
@@ -53,7 +63,7 @@
       </p>
 
       <span id="editable-math" class="mathquill-math-field"
-        >\frac{d}{dx}\sqrt{x}=2 \cdot 3 \cdot HelloWorld.rate.x + \left\{\frac{cm}{s}\right\}</span
+        >\frac{d}{dx}\sqrt{x}=2 \cdot 3 \cdot HelloWorld.rate.x + \left\{\frac{cm}{s}\right\} + "FooBar"</span
       >
       <p>
         <button id="parse-button">Parse</button>
@@ -132,30 +142,21 @@
         console.log("Text:", text);
         console.log("HTML:", html);
 
-        const output = latexMath.semanticParse();
-        console.log(output);
+        const identifiers = latexMath.parseSemanticTypes();
 
-        output.identifiers.forEach((identifier) => {
+        identifiers.forEach((identifier) => {
           console.log(identifier);
           identifier.forEach((token) => {
-            if (token.belongsTo === 'object') {
-              token.element.classList.add('syntex-object');
-            } else if (token.belongsTo === 'property') {
-              token.element.classList.add('syntex-property');
-            } else if (token.belongsTo === 'dot') {
-              token.element.classList.add('syntex-dot');
-            }
+            // if (token.belongsTo === 'object') {
+            //   token.element.classList.add('syntex-object');
+            // } else if (token.belongsTo === 'property') {
+            //   token.element.classList.add('syntex-property');
+            // } else if (token.belongsTo === 'dot') {
+            //   token.element.classList.add('syntex-dot');
+            // }
             // console.log(token.element.classList.add('test'));
           });
         });
-
-        // latexMath.__controller.root.postOrder(function (node) {
-        //   console.log(node.ctrlSeq, node, node._el);
-
-          // This works!
-          // node._el.classList.add('test');
-          // node.registerInnerField(innerFields, APIClasses.InnerMathField);
-        // });
       });
 
       var latexMath = $('#editable-math'),
