@@ -2,6 +2,15 @@
  * The publicly exposed MathQuill API.
  ********************************************************/
 
+interface IdentifierToken {
+  id: string | number
+  text: string
+  type: 'letter' | 'number' | 'underscore' | 'period'
+  belongsTo: 'object' | 'property' | 'period'
+  element: Element | Text | undefined
+  setElement: (element: Element | Text | undefined) => void
+}
+
 type KIND_OF_MQ = 'StaticMath' | 'MathField' | 'InnerMathField' | 'TextField';
 
 /** MathQuill instance fields/methods that are internal, not exposed in the public type defs. */
@@ -331,7 +340,6 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       }
       return this.__controller.exportLatex();
     }
-
     selection() {
       return this.__controller.exportLatexSelection();
     }
@@ -359,6 +367,57 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
     blur() {
       this.__controller.getTextareaOrThrow().blur();
       return this;
+    }
+    semanticParse() {
+      const identifiers: IdentifierToken[][] = [];
+      let identifier: IdentifierToken[] = [];
+
+      let cursorState: 'object' | 'property' | 'period' | 'none' = 'none';
+
+      this.__controller.root.postOrder(function (node) {
+        console.log(node);
+
+        // First, check for any state transitions due to the current token.
+        // A letter can start a new object.
+        if (node instanceof Letter && (cursorState === 'none')) {
+          console.debug("Letter, starting a new object");
+          cursorState = 'object';
+          identifier = [];
+        // A letter after a period is the start of a property.
+        } else if (node instanceof Letter && cursorState === 'period') {
+          console.debug("Last char was period, starting a new property");
+          cursorState = 'property';
+        // A period is a delimiter between an object and a property, or a property and a property.
+        } else if (node instanceof DigitGroupingChar && node.textTemplate[0] === '.') {
+          if (cursorState === 'object' || cursorState === 'property') {
+            console.debug("Period");
+            cursorState = 'period';
+          }
+        } else {
+          if (!(node instanceof Letter || node instanceof Digit) && cursorState !== 'none') {
+            console.debug("End of identifier");
+            cursorState = 'none';
+            identifiers.push(identifier);
+          }
+        }
+
+        // If we're in the middle of an identifier, keep adding to it.
+        if (cursorState === 'object' || cursorState === 'property' || cursorState === 'period') {
+          identifier.push({
+            id: node.id,
+            text: node instanceof Letter ? node.letter :
+                  node instanceof Digit || node instanceof DigitGroupingChar ? node.textTemplate[0] : '',
+            type: 'letter',
+            belongsTo: cursorState,
+            element: node.getDOM(),
+            setElement: node.setDOM,
+          });
+        }
+      });
+
+      return {
+        identifiers: identifiers,
+      };
     }
   }
 
