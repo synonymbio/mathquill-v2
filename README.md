@@ -1,5 +1,16 @@
 # [MathQuill](http://mathquill.com)
 
+## Synonym Developers
+
+### Overview
+
+This is a fork of the MathQuill project. It adds support for some non-standard LaTeX behavior, such as objects (e.g `MyVariable`) and object properties (e.g `Flow.rate.x`). Identifiers are assigned new `mq-identifier ...` class names so that they can be syntax highlighted.
+
+### Changes
+- Add the `parseSemanticTypes` function in `publicapi.js`
+
+## Original README
+
 by [Han](http://github.com/laughinghan), [Jeanine](http://github.com/jneen), and [Mary](http://github.com/stufflebear) (<maintainers@mathquill.com>) [<img alt="slackin.mathquill.com" src="http://slackin.mathquill.com/badge.svg" align="top">](http://slackin.mathquill.com)
 
 MathQuill is a web formula editor designed to make typing math easy and beautiful.
