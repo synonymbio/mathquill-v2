@@ -180,6 +180,10 @@ class NodeBase {
     return this;
   }
 
+  getDOM() {
+    return this._el;
+  }
+
   domFrag(): DOMFragment {
     return domFrag(this._el);
   }
