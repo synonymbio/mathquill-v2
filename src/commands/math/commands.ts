@@ -637,7 +637,8 @@ class SubscriptCommand extends SupSub {
     super.finalizeTree();
   }
 }
-LatexCmds.subscript = LatexCmds._ = SubscriptCommand;
+// NOTE(milo): DISABLED THE SUBSCRIPT COMMAND HERE BY COMMENTING OUT.
+// LatexCmds.subscript = LatexCmds._ = SubscriptCommand;
 
 LatexCmds.superscript =
   LatexCmds.supscript =
