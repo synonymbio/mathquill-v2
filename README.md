@@ -11,8 +11,9 @@ To rebuild the code after making a change, run `make all` in the root directory.
 Before exporting the build to `synonym-react-mathquill`, make sure to run `make basic` also!
 
 ### Changes
+- 
+- Commented out the `SubscriptCommand`
 - Added the `parseSemanticTypes` function in `publicapi.js`
-
 
 ---
 
