@@ -392,8 +392,7 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       // f(hello) would be traversed as:
       // f, h, e, l, l, o, (hello).
       this.__controller.root.postOrder(function (node) {
-        console.debug(node);
-
+        // console.debug(node);
         const nodeIsQuote = (node instanceof VanillaSymbol) &&
           (node.textTemplate[0] === '"' || node.textTemplate[0] === "'");
         const nodeIsUnderscore = node instanceof VanillaSymbol && node.textTemplate[0] === '_';
@@ -406,16 +405,16 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
         if (nodeIsValidIdentifierStart && (cursorState === 'none')) {
           cursorState = 'object';
           identifier = [];
-          console.debug('Starting object');
+          // console.debug('Starting object');
         // A letter after a period is the start of a property.
         } else if (nodeIsValidIdentifierStart && cursorState === 'period') {
           cursorState = 'property';
-          console.debug('Starting property');
+          // console.debug('Starting property');
         // A period is a delimiter between an object and a property, or a property and a property.
         } else if (nodeIsPeriod) {
           if (cursorState === 'object' || cursorState === 'property') {
             cursorState = 'period';
-            console.debug('This is a period');
+            // console.debug('This is a period');
           }
         // A quote is the start of a string literal.
         } else if (nodeIsQuote) {
@@ -441,12 +440,12 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
           if (cursorState === 'literal' && !(nodeIsQuote || node instanceof Letter || node instanceof Digit)) {
             cursorState = 'none';
             identifiers.push(identifier);
-            console.debug('Ending literal');
+            // console.debug('Ending literal');
           // Is this the end of an identifier?
           } else if ((!nodeBeforeIsValidToken || !(node instanceof Letter || node instanceof Digit)) && cursorState !== 'none') {
             cursorState = 'none';
             identifiers.push(identifier);
-            console.debug('Ending identifier');
+            // console.debug('Ending identifier');
           }
         }
 
@@ -454,7 +453,7 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
         if (nodeIsValidIdentifierStart && (cursorState === 'none')) {
           cursorState = 'object';
           identifier = [];
-          console.debug('Starting object (after ending one!)');
+          // console.debug('Starting object (after ending one!)');
         } 
 
         // If we're in the middle of an identifier, keep adding to it.
