@@ -822,16 +822,17 @@ LatexCmds.f = class extends Letter {
 
     this.letter = letter;
     this.domView = new DOMView(0, () =>
-      h('var', { class: 'mq-f' }, [h.text('f')])
+      h('var', { class: 'mq-f-disabled' }, [h.text('f')])
     );
   }
-  italicize(bool: boolean) {
-    // Why is this necesssary? Does someone replace the `f` at some
-    // point?
-    this.domFrag().eachElement((el) => (el.textContent = 'f'));
-    this.domFrag().toggleClass('mq-f', bool);
-    return super.italicize(bool);
-  }
+  // NOTE(milo): Disabling this, since we don't want a special `f` function.
+  // italicize(bool: boolean) {
+  //   // Why is this necesssary? Does someone replace the `f` at some
+  //   // point?
+  //   this.domFrag().eachElement((el) => (el.textContent = 'f'));
+  //   this.domFrag().toggleClass('mq-f', bool);
+  //   return super.italicize(bool);
+  // }
 };
 
 // VanillaSymbol's

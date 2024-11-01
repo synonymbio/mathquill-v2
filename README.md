@@ -4,14 +4,18 @@
 
 ### Overview
 
-This is a fork of the MathQuill project. It adds support for some non-standard LaTeX behavior, such as objects (e.g `MyVariable`) and object properties (e.g `Flow.rate.x`). Identifiers are assigned new `mq-identifier ...` class names so that they can be syntax highlighted.
+This is a fork of the **MathQuill** project. It adds support for some non-standard LaTeX behavior, such as objects (e.g `MyVariable`) and object properties (e.g `Flow.rate.x`). Identifiers are assigned new `mq-identifier ...` class names so that they can be syntax highlighted.
 
 To rebuild the code after making a change, run `make all` in the root directory. You can then run an example in your browser by opening e.g `examples/parsing.html`. You need to re-run `make all` after any change in the library.
 
 Before exporting the build to `synonym-react-mathquill`, make sure to run `make basic` also!
 
 ### Changes
+- Got rid of the special `mq-f` class
+- Commented out the `SubscriptCommand`
 - Added the `parseSemanticTypes` function in `publicapi.js`
+
+---
 
 ## Original README
 

@@ -393,20 +393,21 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       // f, h, e, l, l, o, (hello).
       this.__controller.root.postOrder(function (node) {
         // console.debug(node);
-
         const nodeIsQuote = (node instanceof VanillaSymbol) &&
           (node.textTemplate[0] === '"' || node.textTemplate[0] === "'");
-
+        const nodeIsUnderscore = node instanceof VanillaSymbol && node.textTemplate[0] === '_';
         const nodeIsPeriod = node instanceof DigitGroupingChar && node.textTemplate[0] === '.';
+        const nodeIsValidIdentifierStart = (node instanceof Letter) || nodeIsUnderscore;
+        const nodeCanContinueIdentifier = (node instanceof Letter) || (node instanceof Digit) || nodeIsUnderscore;
 
         // First, check for any state transitions due to the current token.
         // A letter can start a new object.
-        if (node instanceof Letter && (cursorState === 'none')) {
+        if (nodeIsValidIdentifierStart && (cursorState === 'none')) {
           cursorState = 'object';
           identifier = [];
           // console.debug('Starting object');
         // A letter after a period is the start of a property.
-        } else if (node instanceof Letter && cursorState === 'period') {
+        } else if (nodeIsValidIdentifierStart && cursorState === 'period') {
           cursorState = 'property';
           // console.debug('Starting property');
         // A period is a delimiter between an object and a property, or a property and a property.
@@ -423,25 +424,35 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
             // console.debug('Starting literal');
           }
         } else {
-          const nodeBeforeIsPeriod = node[L] && node[L] instanceof DigitGroupingChar && node[L].textTemplate[0] === '.';
-          const nodeBeforeIsQuote = node[L] && node[L] instanceof VanillaSymbol && (node[L].textTemplate[0] === '"' || node[L].textTemplate[0] === "'");
+          const nodeBeforeIsPeriod = node[L] &&
+            (node[L] instanceof DigitGroupingChar) && (node[L].textTemplate[0] === '.');
+          const nodeBeforeIsQuote = node[L] &&
+            (node[L] instanceof VanillaSymbol) && (node[L].textTemplate[0] === '"' || node[L].textTemplate[0] === "'");
+          const nodeBeforeIsUnderscore = node[L] &&
+            (node[L] instanceof VanillaSymbol) && (node[L].textTemplate[0] === '_');
           const nodeBeforeIsValidToken =
-            node[L] && node[L] instanceof Letter || node[L] instanceof Digit || nodeBeforeIsPeriod || nodeBeforeIsQuote;
+            node[L] && (
+              (node[L] instanceof Letter) ||
+              (node[L] instanceof Digit) ||
+              nodeBeforeIsUnderscore ||
+              nodeBeforeIsPeriod ||
+              nodeBeforeIsQuote
+            );
           // Is this the end of a string literal?
-          if (cursorState === 'literal' && !(nodeIsQuote || node instanceof Letter || node instanceof Digit)) {
+          if (cursorState === 'literal' && !(nodeIsQuote || nodeCanContinueIdentifier)) {
             cursorState = 'none';
             identifiers.push(identifier);
             // console.debug('Ending literal');
           // Is this the end of an identifier?
-          } else if ((!nodeBeforeIsValidToken || !(node instanceof Letter || node instanceof Digit)) && cursorState !== 'none') {
+          } else if ((!nodeBeforeIsValidToken || !nodeCanContinueIdentifier) && (cursorState !== 'none')) {
             cursorState = 'none';
             identifiers.push(identifier);
             // console.debug('Ending identifier');
           }
         }
 
-        // This letter might have just ENDED and identifier and STARTED one.
-        if (node instanceof Letter && (cursorState === 'none')) {
+        // This letter might have just ENDED an identifier and STARTED one.
+        if (nodeIsValidIdentifierStart && (cursorState === 'none')) {
           cursorState = 'object';
           identifier = [];
           // console.debug('Starting object (after ending one!)');
