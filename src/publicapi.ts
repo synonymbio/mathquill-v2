@@ -397,8 +397,8 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
           (node.textTemplate[0] === '"' || node.textTemplate[0] === "'");
         const nodeIsUnderscore = node instanceof VanillaSymbol && node.textTemplate[0] === '_';
         const nodeIsPeriod = node instanceof DigitGroupingChar && node.textTemplate[0] === '.';
-        
-        const nodeIsValidIdentifierStart = node instanceof Letter || nodeIsUnderscore;
+        const nodeIsValidIdentifierStart = (node instanceof Letter) || nodeIsUnderscore;
+        const nodeCanContinueIdentifier = (node instanceof Letter) || (node instanceof Digit) || nodeIsUnderscore;
 
         // First, check for any state transitions due to the current token.
         // A letter can start a new object.
@@ -428,21 +428,23 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
             (node[L] instanceof DigitGroupingChar) && (node[L].textTemplate[0] === '.');
           const nodeBeforeIsQuote = node[L] &&
             (node[L] instanceof VanillaSymbol) && (node[L].textTemplate[0] === '"' || node[L].textTemplate[0] === "'");
+          const nodeBeforeIsUnderscore = node[L] &&
+            (node[L] instanceof VanillaSymbol) && (node[L].textTemplate[0] === '_');
           const nodeBeforeIsValidToken =
             node[L] && (
               (node[L] instanceof Letter) ||
               (node[L] instanceof Digit) ||
-              nodeIsUnderscore ||
+              nodeBeforeIsUnderscore ||
               nodeBeforeIsPeriod ||
               nodeBeforeIsQuote
             );
           // Is this the end of a string literal?
-          if (cursorState === 'literal' && !(nodeIsQuote || node instanceof Letter || node instanceof Digit)) {
+          if (cursorState === 'literal' && !(nodeIsQuote || nodeCanContinueIdentifier)) {
             cursorState = 'none';
             identifiers.push(identifier);
             // console.debug('Ending literal');
           // Is this the end of an identifier?
-          } else if ((!nodeBeforeIsValidToken || !(node instanceof Letter || node instanceof Digit)) && cursorState !== 'none') {
+          } else if ((!nodeBeforeIsValidToken || !nodeCanContinueIdentifier) && (cursorState !== 'none')) {
             cursorState = 'none';
             identifiers.push(identifier);
             // console.debug('Ending identifier');
