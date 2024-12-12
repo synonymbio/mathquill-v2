@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=624" />
 
-    <title>MathQuill Demo</title>
+    <title>Synonym MathQuill Demo</title>
 
     <link rel="stylesheet" type="text/css" href="support/home.css" />
     <link rel="stylesheet" type="text/css" href="../build/mathquill.css" />
@@ -32,6 +32,10 @@
       }
       .mq-identifier {
         color: red;
+        font-style: normal !important;
+      }
+      .mq-digit {
+        color: violet;
       }
       .mq-identifier-object {
         color: green;
@@ -44,10 +48,18 @@
       }
       .mq-literal {
         color: orange;
+        font-style: normal !important;
       }
       .mq-comma {
         padding-left: 0.2em;
         padding-right: 0.2em;
+      }
+      .test-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
       }
     </style>
   </head>
@@ -58,17 +70,38 @@
         <small>local test page</small>
       </h1>
 
+      <strong>
+        Do all of these parse correctly?
+      </strong>
       <p>
-        Math textbox with initial LaTeX:
+        Add more test cases here as sanity checks!
       </p>
 
-      <span id="editable-math" class="mathquill-math-field">
-        \frac{d}{dx}\sqrt{x}=2 \cdot 3 \cdot HelloWorld.rate.x + \left\{\frac{cm}{s}\right\} + "FooBar" + function(Variable) + Var.property_xyz      
-      </span
+      <div class="test-container">
+        <div id="editable-math-1" class="mathquill-math-field">
+          2 \cdot 3 \cdot \left\{\frac{cm}{s}\right\} + 4 \cdot \left\{J \cdot min \right\}
+        </div>
+  
+        <div id="editable-math-2" class="mathquill-math-field">
+          x = CamelCaseVariable \cdot snake_case_variable^{3.14159 + Hello} + f(x, y, zed)
+        </div>
+  
+        <div id="editable-math-3" class="mathquill-math-field">
+          x.rate.x = z.rate.x - y.rate.x
+        </div>
 
-      <p>
+        <div id="editable-math-4" class="mathquill-math-field">
+          sin(x) + cos(y) + tan(Hello.world.foo.bar) + \frac{Variable.x}{Variable.y}
+        </div>
+
+        <div id="editable-math-4" class="mathquill-math-field">
+          "StringLiteral" + 'otherstringliteral'
+        </div>
+      </div>
+
+      <div>
         <button id="parse-button">Parse</button>
-      </p>
+      </div>
 
       <p>
         <a href="javascript:;" id="show-html-source"
@@ -76,20 +109,6 @@
         >
       </p>
       <pre id="html-source"></pre>
-
-      <p>
-        This button runs the JavaScript code written on it to MathQuill-ify the
-        following <code>&lt;span&gt;</code> element into an editable math
-        textbox:
-        <button
-          onclick="$(this).text('MQ(this.nextSibling).revert()'); MQ.MathField(this.nextSibling); var orig = arguments.callee; this.onclick = function(){ $(this).text('MQ.MathField(this.nextSibling)'); MQ(this.nextSibling).revert(); this.onclick = orig; };"
-        >
-          MQ.MathField(this.nextSibling)</button
-        ><span
-          >\frac{d}{dx}\sqrt{x} = \frac{d}{dx}x^{\frac{1}{2}} =
-          \frac{1}{2}x^{-\frac{1}{2}} = \frac{1}{2\sqrt{x}}</span
-        >
-      </p>
     </div>
     <script type="text/javascript" src="support/jquery-1.5.2.js"></script>
     <script type="text/javascript" src="../build/mathquill.js"></script>
@@ -109,6 +128,7 @@
           MQ.StaticMath(this, { tabbable: true });
         });
         $('.mathquill-math-field').each(function () {
+          console.debug("MathQuill:", MQ);
           MQ.MathField(this);
         });
         $('.mathquill-text-field').each(function () {
@@ -135,32 +155,37 @@
 
       $('#parse-button').click(function () {
         // This is how you get the MQ element:
-        var latexMath = MQ($('#editable-math')[0]);
-        const latex = latexMath.latex();
-        const text = latexMath.text();
-        const html = latexMath.html();
-        console.log("LaTeX:", latex);
-        console.log("Text:", text);
-        console.log("HTML:", html);
+        $(".mathquill-math-field").each(function () {
+          var latexMath = MQ(this);
+          console.debug('---------------------------------------------------')
+          console.debug(this);
+          const latex = latexMath.latex();
+          const text = latexMath.text();
+          const html = latexMath.html();
+          console.log("[parse] LaTeX:", latex);
+          console.log("[parse] Text:", text);
+          console.log("[parse] HTML:", html);
 
-        const identifiers = latexMath.parseSemanticTypes();
-
-        identifiers.forEach((identifier) => {
-          console.log(identifier);
-          identifier.forEach((token) => {
-            // if (token.belongsTo === 'object') {
-            //   token.element.classList.add('syntex-object');
-            // } else if (token.belongsTo === 'property') {
-            //   token.element.classList.add('syntex-property');
-            // } else if (token.belongsTo === 'dot') {
-            //   token.element.classList.add('syntex-dot');
-            // }
-            // console.log(token.element.classList.add('test'));
+          const identifiers = latexMath.parseSemanticTypes();
+          
+          console.log("[parse] Identifiers:");
+          identifiers.forEach((identifier) => {
+            console.log(identifier);
+            identifier.forEach((token) => {
+              // if (token.belongsTo === 'object') {
+              //   token.element.classList.add('syntex-object');
+              // } else if (token.belongsTo === 'property') {
+              //   token.element.classList.add('syntex-property');
+              // } else if (token.belongsTo === 'dot') {
+              //   token.element.classList.add('syntex-dot');
+              // }
+              // console.log(token.element.classList.add('test'));
+            });
           });
         });
       });
 
-      var latexMath = $('#editable-math'),
+      var latexMath = $('#editable-math-1'),
         latexSource = $('#latex-source'),
         htmlSource = $('#html-source'),
         codecogsimg = $('#codecogsimg'),
@@ -177,38 +202,40 @@
       });
 
       $(function () {
-        var latexMath = MQ($('#editable-math')[0]);
-        latexMath.config({
-          handlers: {
-            edit: function () {
-              var latex = latexMath.latex();
-              latexSource.val(latex);
-              //        location.hash = '#'+latex; //extremely performance-crippling in Chrome for some reason
-              htmlSource.text(printTree(latexMath.html()));
-              htmlTransplantExample.html(latexMath.html());
-            }
-          }
-        });
-        latexMath.focus();
-
-        latexSource.val(latexMath.latex());
-        latexSource.bind('keydown keypress', function () {
-          var oldtext = latexSource.val();
-          setTimeout(function () {
-            var newtext = latexSource.val();
-            if (newtext !== oldtext) {
-              latexMath.latex(newtext);
-              htmlSource.text(printTree(latexMath.html()));
-              htmlTransplantExample.html(latexMath.html());
+        // Process each editable math field:
+        $('.mathquill-math-field').each(function (index, elem) {
+          var latexMath = MQ(elem);
+          latexMath.config({
+            handlers: {
+              edit: function () {
+                var latex = latexMath.latex();
+                latexSource.val(latex);
+                htmlSource.text(printTree(latexMath.html()));
+                htmlTransplantExample.html(latexMath.html());
+              }
             }
           });
-        });
+          latexMath.focus();
 
-        htmlSource.text(printTree(latexMath.html()));
-        htmlTransplantExample.html(latexMath.html());
+          latexSource.val(latexMath.latex());
+          latexSource.bind('keydown keypress', function () {
+            var oldtext = latexSource.val();
+            setTimeout(function () {
+              var newtext = latexSource.val();
+              if (newtext !== oldtext) {
+                latexMath.latex(newtext);
+                htmlSource.text(printTree(latexMath.html()));
+                htmlTransplantExample.html(latexMath.html());
+              }
+            });
+          });
 
-        if (location.hash && location.hash.length > 1)
-          latexMath.latex(decodeURIComponent(location.hash.slice(1))).focus();
+          htmlSource.text(printTree(latexMath.html()));
+          htmlTransplantExample.html(latexMath.html());
+
+          if (location.hash && location.hash.length > 1)
+            latexMath.latex(decodeURIComponent(location.hash.slice(1))).focus();
+        })
       });
 
       $('.insert-trigger').click(function () {

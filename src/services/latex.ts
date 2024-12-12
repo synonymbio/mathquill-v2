@@ -363,6 +363,7 @@ class Controller_latex extends Controller_keystroke {
     var all = Parser.all;
     var eof = Parser.eof;
 
+    // NOTE(milo): If parsing fails, `block` will have value `false` here.
     var block = latexMathParser
       .skip(eof)
       .or(all.result<false>(false))
@@ -383,6 +384,7 @@ class Controller_latex extends Controller_keystroke {
       root.domFrag().empty();
     }
   }
+  // NOTE(milo): This is where parsing happens!
   renderLatexMath(latex: unknown) {
     var cursor = this.cursor;
     var root = this.root;

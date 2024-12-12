@@ -200,8 +200,10 @@ class Parser<T> {
     });
   }
 
-  static letter = Parser.regex(/^[a-z]/i);
-  static letters = Parser.regex(/^[a-z]*/i);
+  // NOTE(milo): Added underscores to the valid letters! This allows the input
+  // latex to use _ outside of a \text{} and still be parsed correctly!
+  static letter = Parser.regex(/^[a-z_]/i); // CHANGED
+  static letters = Parser.regex(/^[a-z_]*/i); // CHANGED
   static digit = Parser.regex(/^[0-9]/);
   static digits = Parser.regex(/^[0-9]*/);
   static whitespace = Parser.regex(/^\s+/);

@@ -284,6 +284,8 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       _interfaceVersion: number
     ): IBaseMathQuill;
 
+    // NOTE(milo): This gets called to turn an HTML element into a MathQuill
+    // rendered math block.
     mathquillify(classNames: string) {
       var ctrlr = this.__controller,
         root = ctrlr.root,
