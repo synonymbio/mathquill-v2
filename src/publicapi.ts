@@ -533,6 +533,14 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
             bracketNodes.push(node);
           }
         }
+
+        // Label any comma nodes encountered.
+        if (node instanceof VanillaSymbol && node.textTemplate[0] === ',') {
+          const element = node.getDOM();
+          if (element instanceof Element) {
+            element.classList.add('mq-comma');
+          }
+        }
       });
 
       // Label any descendents of bracket nodes.
