@@ -385,6 +385,42 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       let cursorState: 'object' | 'property' | 'period' | 'none' | 'literal' = 'none';
       let bracketNodes: Bracket[] = [];
 
+      const getNodeType = (node: MQNode) => {
+        if (node instanceof Letter) {
+          return 'letter';
+        } else if (node instanceof Digit) {
+          return 'number';
+        } else if (node instanceof DigitGroupingChar && node.textTemplate[0] === '.') {
+          return 'period';
+        } else if (node instanceof DigitGroupingChar && node.textTemplate[0] === '_') {
+          return 'underscore';
+        } else if (node instanceof VanillaSymbol && (node.textTemplate[0] === '_')) {
+          return 'underscore';
+        } else if (node instanceof VanillaSymbol && (node.textTemplate[0] === '"' || node.textTemplate[0] === "'")) {
+          return 'quote';
+        } else {
+          return 'unknown';
+        }
+      }
+
+      const getNodeText = (node: MQNode) => {
+        if (node instanceof Letter) {
+          return node.letter;
+        } else if (node instanceof Digit) {
+          return node.textTemplate[0];
+        } else if (node instanceof DigitGroupingChar && node.textTemplate[0] === '.') {
+          return ".";
+        } else if (node instanceof DigitGroupingChar && node.textTemplate[0] === '_') {
+          return '_';
+        } else if (node instanceof VanillaSymbol && (node.textTemplate[0] === '_')) {
+          return '_';
+        } else if (node instanceof VanillaSymbol && (node.textTemplate[0] === '"' || node.textTemplate[0] === "'")) {
+          return node.textTemplate[0];
+        } else {
+          return 'unknown';
+        }
+      }
+
       // The postOrder follows a left, right, then parent order. This means that
       // it will visit all of the letters in an identifier in sequence, allowing
       // us to detect them.
@@ -393,6 +429,8 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
       // f, h, e, l, l, o, (hello).
       this.__controller.root.postOrder(function (node) {
         // console.debug(node);
+        // const nodeIsLetter = node instanceof Letter;
+        // const nodeIsDigit = node instanceof Digit || node instanceof DigitGroupingChar;
         const nodeIsQuote = (node instanceof VanillaSymbol) &&
           (node.textTemplate[0] === '"' || node.textTemplate[0] === "'");
         const nodeIsUnderscore = node instanceof VanillaSymbol && node.textTemplate[0] === '_';
@@ -475,16 +513,9 @@ function getInterface(v: number): MathQuill.v3.API | MathQuill.v1.API {
               element.classList.add('mq-literal');
             }
           }
-          const text = node instanceof Letter ? node.letter :
-                       node instanceof Digit || node instanceof DigitGroupingChar ? node.textTemplate[0] :
-                       node instanceof VanillaSymbol && (node.textTemplate[0] === '"' || node.textTemplate[0] === "'") ? node.textTemplate[0] :
-                       'unknown';
-          const type = node instanceof Letter ? 'letter' :
-                      node instanceof Digit ? 'number' :
-                      node instanceof DigitGroupingChar && node.textTemplate[0] === '.' ? 'period' :
-                      node instanceof DigitGroupingChar && node.textTemplate[0] === '_' ? 'underscore' :
-                      node instanceof VanillaSymbol && (node.textTemplate[0] === '"' || node.textTemplate[0] === "'") ? 'quote' :
-                      'unknown';
+          const text = getNodeText(node);
+          const type = getNodeType(node);
+
           identifier.push({
             id: node.id,
             text: text,
